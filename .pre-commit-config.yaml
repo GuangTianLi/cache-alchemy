@@ -1,0 +1,14 @@
+fail_fast: true
+repos:
+- repo: local
+  hooks:
+
+  - id: format
+    name: format
+    entry: pipenv run format
+    exclude: >
+        (?x)^(
+            docs/.+
+        )$
+    language: python
+    types: [python]

@@ -1,0 +1,56 @@
+=====
+Usage
+=====
+
+.. warning:: The cache decorator must be used after config initialized.
+
+.. warning:: The client must be assigned after config initialized if you want to use distributed cache.
+
+To use Cache Alchemy in a project.
+
+.. code-block:: python
+
+    from cache_alchemy import memory_cache, redis_cache
+    from cache_alchemy.config import DefaultConfig
+    from redis import StrictRedis
+
+    config = DefaultConfig()
+    config.client = StrictRedis.from_url(config.cache_alchemy_REDIS_URL)
+
+    @memory_cache()
+    def add(i: complex, j: complex) -> complex:
+        return i + j
+
+    @redis_cache()
+    def add(i: int, j: int) -> int:
+        return i + j
+
+
+Configuration
+==============================================
+
+You can define your custom config by inherit from :any:`DefaultConfig` which defined
+a list of configuration available in Cache Alchemy and their default values.
+
+.. note:: DefaultConfig is defined by `configalchemy` - https://configalchemy.readthedocs.io
+
+General Memory Cache
+==========================
+
+Cache Alchemy use distributed backend as default backend to cache function return value.
+
+By setting ``CACHE_ALCHEMY_MEMORY_BACKEND`` to ``cache_alchemy.backends.memory.MemoryCache`` can enable general memory cache backend.
+
+.. code-block:: python
+
+    from cache_alchemy import memory_cache, redis_cache
+    from cache_alchemy.config import DefaultConfig
+
+    class CacheConfig(DefaultConfig):
+        cache_alchemy_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
+
+    config = CacheConfig()
+
+    @memory_cache()
+    def add(i: complex, j: complex) -> complex:
+        return i + j
