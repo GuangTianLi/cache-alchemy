@@ -1,7 +1,6 @@
 import json
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, Union
 
-from configalchemy import get_current_config
 from configalchemy.types import JsonSerializable
 
 from .base import BaseCache
@@ -54,5 +53,7 @@ class DistributedCache(BaseCache):
     def process_value(self, value: ReturnType) -> str:
         return json.dumps(value)
 
-    def process_result(self, result: str) -> ReturnType:
+    def process_result(self, result: Union[str, bytes]) -> ReturnType:
+        if isinstance(result, bytes):
+            result = result.decode()
         return json.loads(result)
