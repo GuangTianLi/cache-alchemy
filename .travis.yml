@@ -1,0 +1,26 @@
+language: python
+install:
+- pip install -U tox-travis
+- pip install codecov coverage
+script: tox
+matrix:
+  include:
+  - python: 3.6
+    env: TOXENV=linters
+  - python: 3.6
+    env: TOXENV=py36
+  - python: 3.7
+    env: TOXENV=py37
+after_success:
+- codecov
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: guangtianli
+  password:
+    secure: Ve9u3fIy+M48o9mk4VJjtsWUFZpaBAPoLG4TKsFtyLL2fs5mIKcjxJH/h0ZHIYmKTawk/IqZerssLGgwlP0E98B1nWtWZhDXMTqHMP6rBhVXGv9yUIQdN4oVca3jNyZNPQvN7Acpmyengckn5SVlP6zqNoFTsI4q57Kyt9CjbdtuKkWj0+hYTA8Z7ZC34ioqIVXMeL4L7VffdYr8MzosJIcaHdM6fh/FLerAkcwINPqorLCjHsjwZ/L9qNY6Pdckr6fdrVZzbxP8h8GAKrZAQB5empEasPGSEUrJstzAolSQCZ0XQlbKFZEqzsWbVEi0wHopT/0BO6PikUUb/kw/aU9BVh+3SKBWdoIHipd4t/DuDJU42Lnjdlc1ns+HS2TcXFHPQjUB3RiXkSKyiX4WT/7w+MhtRHhdCk9ntoLCjqLTGJ9H2VhR37tePrxIotLgtRK4LuWcvWD0vy+o/qpPVRCW8cFY8Nf2bWAkVH35GQzUXhs4szok5Fl8Sg5ooVOf3c1H3apYRW+OzUFcnwKp0hH7nKkJqEcHchL18P793jhee9Sl001GnAzV6U5RvY9BOwk+RR2rieKUJF4kTpP8XMWXal9KIXmMPx0E2H2U1zIMik/rhGn63XSo1jUT5874X5Y8QR0aO5NHjlIdlkZWBwRi/jzhyodmNIiXx+OGjX8=
+  on:
+    tags: true
+    repo: GuangTianLi/cache_alchemy
+    python: 3.7
+    skip_existing: true
