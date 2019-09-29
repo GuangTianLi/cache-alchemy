@@ -1,6 +1,6 @@
-============
-cache_alchemy
-============
+===============
+Cache Alchemy
+===============
 
 .. image:: https://img.shields.io/pypi/v/cache_alchemy.svg
         :target: https://pypi.python.org/pypi/cache_alchemy
