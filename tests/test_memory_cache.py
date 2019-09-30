@@ -15,12 +15,15 @@ class MemoryCacheTestCase(CacheTestCase):
             call_mock()
             return result
 
-        self.assertEqual(add(1), result)
+        self.assertEqual(result, add(1))
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(1), result)
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(2), result)
         self.assertEqual(call_mock.call_count, 2)
+        add.cache_clear()
+        self.assertEqual(add(2), result)
+        self.assertEqual(call_mock.call_count, 3)
 
     def test_memory_cache(self):
         class TestMemoryCacheConfig(DefaultConfig):
@@ -42,6 +45,9 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(2), result)
         self.assertEqual(call_mock.call_count, 2)
+        add.cache_clear()
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 3)
 
 
 if __name__ == "__main__":

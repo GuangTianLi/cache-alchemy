@@ -46,7 +46,8 @@ class DistributedCache(BaseCache):
     def cache_clear(self) -> bool:
         with self.client.pipeline() as pipe:
             pipe.delete(*self.client.smembers(self.namespace))
-            pipe.delete(self.namespace_set)
+            pipe.delete(self.namespace)
+            pipe.srem(self.namespace_set, self.namespace)
             pipe.execute()
         return True
 

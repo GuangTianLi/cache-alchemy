@@ -15,17 +15,20 @@ class RedisCacheTestCase(CacheTestCase):
             return a + b
 
         self.assertEqual(add(1), 3)
-        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(1, call_mock.call_count)
         self.assertEqual(1, add.cache.misses)
         self.assertEqual(0, add.cache.hits)
         self.assertEqual(add(a=1), 3)
         self.assertEqual(1, add.cache.misses)
         self.assertEqual(1, add.cache.hits)
-        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(1, call_mock.call_count)
         self.assertEqual(add(a=2), 4)
-        self.assertEqual(call_mock.call_count, 2)
-        self.assertEqual(2, add.cache.misses)
-        self.assertEqual(1, add.cache.hits)
+        self.assertEqual(2, call_mock.call_count)
+        self.assertEqual(add.cache.misses, 2)
+        self.assertEqual(add.cache.hits, 1)
+        add.cache_clear()
+        self.assertEqual(add(a=2), 4)
+        self.assertEqual(3, call_mock.call_count)
 
     def test_cache_method(self):
         call_mock = Mock()

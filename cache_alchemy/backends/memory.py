@@ -52,17 +52,17 @@ class MemoryCache(BaseCache):
         return True
 
 
-class DistributedMemoryCache(DistributedCache, MemoryCache):
+class DistributedMemoryCache(MemoryCache, DistributedCache):
     def __init__(self, *, cached_function: FunctionType, **kwargs):
         super().__init__(cached_function=cached_function, **kwargs)
 
     def get(self, *args, **kwargs) -> ReturnType:
-        return super(DistributedCache, self).get(*args, **kwargs)
+        return super().get(*args, **kwargs)
 
     def set(self, key: str, value: Any) -> None:
         self.client.sadd(self.namespace_set, self.namespace)
         timestamp = int(time.time())
-        super().set(key, timestamp)
+        super(MemoryCache, self).set(key, timestamp)
         self.cache_pool[key] = CacheItem(timestamp=timestamp, value=value)
 
     def get_timestamp(self, cache_key: str) -> int:
