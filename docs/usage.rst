@@ -17,11 +17,11 @@ To use Cache Alchemy in a project.
     config = DefaultConfig()
     config.client = StrictRedis.from_url(config.cache_alchemy_REDIS_URL)
 
-    @memory_cache()
+    @memory_cache
     def add(i: complex, j: complex) -> complex:
         return i + j
 
-    @redis_cache()
+    @redis_cache
     def add(i: int, j: int) -> int:
         return i + j
 
@@ -51,6 +51,6 @@ By setting ``CACHE_ALCHEMY_MEMORY_BACKEND`` to ``cache_alchemy.backends.memory.M
 
     config = CacheConfig()
 
-    @memory_cache()
+    @memory_cache
     def add(i: complex, j: complex) -> complex:
         return i + j
