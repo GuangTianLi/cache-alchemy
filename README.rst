@@ -34,7 +34,7 @@ Installation
 
 .. code-block:: shell
 
-    $ pipenv install cache_alchemy
+    $ pipenv install cache-alchemy
     ✨🍰✨
 
 Only **Python 3.6+** is supported.
@@ -51,11 +51,11 @@ Example
     config = DefaultConfig()
     config.client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
 
-    @memory_cache()
+    @memory_cache
     def add(i: complex, j: complex) -> complex:
         return i + j
 
-    @redis_cache()
+    @redis_cache
     def add(i: int, j: int) -> int:
         return i + j
 
@@ -64,6 +64,7 @@ Features
 
 - Cache ``Json Serializable`` function return value with Distributed Redis Cache
 - Cache any function return value with Distributed Memory Cache
+- LRU Dict support - behave like normal dict
 
 TODO
 -------
