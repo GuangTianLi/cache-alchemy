@@ -35,7 +35,7 @@ class DistributedCache(BaseCache):
             self.client.delete(del_key)
 
         pipe = self.client.pipeline()
-        if self.expire <= 0:
+        if self.expire == -1:
             pipe.set(key, value)
         else:
             pipe.setex(key, self.expire, value)

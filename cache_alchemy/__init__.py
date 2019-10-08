@@ -30,8 +30,8 @@ def _create_cache(
 
     if not isinstance(limit, int) or limit < -1:
         raise TypeError("Expected limit to larger equal than -1")
-    if not isinstance(expire, int) or expire < 0:
-        raise TypeError("Expected limit to larger than 0")
+    if not isinstance(expire, int) or expire < -1:
+        raise TypeError("Expected expire to larger equal than -1")
 
     return backend_cls(  # type: ignore
         cached_function=cached_function,
@@ -61,8 +61,10 @@ def cache(
     module_path, class_name = backend.rsplit(".", 1)
     backend_cls = getattr(import_module(module_path), class_name)
 
-    limit = limit or config.CACHE_ALCHEMY_DEFAULT_LIMIT
-    expire = expire or config.CACHE_ALCHEMY_DEFAULT_EXPIRE
+    if limit is None:
+        limit = config.CACHE_ALCHEMY_DEFAULT_LIMIT
+    if expire is None:
+        expire = config.CACHE_ALCHEMY_DEFAULT_EXPIRE
 
     def decorating_function(func: CacheFunctionType) -> CacheFunctionType:
         if limit == 0 or expire == 0:

@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from tests import CacheTestCase
 from cache_alchemy import redis_cache
+import time
 
 
 class RedisCacheTestCase(CacheTestCase):
@@ -93,6 +94,47 @@ class RedisCacheTestCase(CacheTestCase):
         add.cache_clear()
         self.assertEqual(add(a=1), 3)
         self.assertEqual(call_mock.call_count, 2)
+
+    def test_redis_cache_limit(self):
+        call_mock = Mock()
+
+        @redis_cache(limit=1)
+        def add(a: int, b: int = 2) -> int:
+            call_mock()
+            return a + b
+
+        self.assertEqual(add(1), 3)
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(a=2), 4)
+        self.assertEqual(call_mock.call_count, 2)
+        self.assertEqual(add(1), 3)
+        self.assertEqual(call_mock.call_count, 3)
+
+    def test_redis_cache_expire(self):
+        call_mock = Mock()
+
+        @redis_cache(expire=1)
+        def add(a: int, b: int = 2) -> int:
+            call_mock()
+            return a + b
+
+        self.assertEqual(add(1), 3)
+        self.assertEqual(call_mock.call_count, 1)
+        time.sleep(3)
+        self.assertEqual(add(a=1), 3)
+        self.assertEqual(call_mock.call_count, 2)
+
+        unexpired_add_call_mock = Mock()
+
+        @redis_cache(expire=-1)
+        def unexpired_add(a: int, b: int = 2) -> int:
+            unexpired_add_call_mock()
+            return a + b
+
+        self.assertEqual(unexpired_add(1), 3)
+        self.assertEqual(unexpired_add_call_mock.call_count, 1)
+        self.assertEqual(unexpired_add(a=1), 3)
+        self.assertEqual(unexpired_add_call_mock.call_count, 1)
 
 
 if __name__ == "__main__":

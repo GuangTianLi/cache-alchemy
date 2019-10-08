@@ -40,6 +40,10 @@ class UtilsTestCase(unittest.TestCase):
         )
         self.assertEqual(
             "a1b2",
+            generate_key(args=(1,), kwargs=dict(b=2), func=lambda a, *, b=1: ...)[2],
+        )
+        self.assertEqual(
+            "a1b2",
             generate_key(args=(1,), kwargs=dict(b=2), func=lambda a=1, b=1: ...)[2],
         )
         self.assertEqual(

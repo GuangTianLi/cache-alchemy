@@ -36,16 +36,16 @@ class BaseCache(ABC):
         return f"{self.__class__.__name__}:all-keys"
 
     @abstractmethod
-    def get(self, *args, **kwargs) -> ReturnType:
-        pass
+    def get(self, *args, **kwargs) -> ReturnType:  # pragma: no cover
+        ...
 
     @abstractmethod
-    def set(self, key: str, value: Any) -> None:
-        pass
+    def set(self, key: str, value: Any) -> None:  # pragma: no cover
+        ...
 
     @abstractmethod
-    def cache_clear(self) -> bool:
-        pass
+    def cache_clear(self) -> bool:  # pragma: no cover
+        ...
 
     def cache_context(self, key: str) -> ContextManager:
         self.hits += 1

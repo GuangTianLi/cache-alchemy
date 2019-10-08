@@ -3,7 +3,7 @@ from weakref import ref
 
 from configalchemy import BaseConfig
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from redis import StrictRedis
 
 _current_config_ref = ref(object)

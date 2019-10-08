@@ -1,18 +1,21 @@
 from threading import RLock as Lock
+from typing import Optional, Any
 
 
 class DoubleLink:
     __slots__ = ("prev", "next", "key", "result")
 
-    def __init__(self, prev=None, next=None, key=None, result=None):
-        self.prev = prev or self
-        self.next = next or self
+    def __init__(
+        self, prev=None, next=None, key: Optional[str] = None, result: Any = None
+    ):
+        self.prev: DoubleLink = prev or self
+        self.next: DoubleLink = next or self
         self.key = key
         self.result = result
 
     def __iter__(self):
         if self.prev.result is None:
-            raise StopIteration()
+            return
         yield self.prev.result
         yield from self.prev
 
