@@ -96,12 +96,15 @@ def cache(
         wrapper.cache_clear = cache_clear  # type: ignore
         return wrapper
 
+    if callable(limit):
+        user_function, limit = limit, config.CACHE_ALCHEMY_DEFAULT_LIMIT
+        return decorating_function(user_function)
     return decorating_function
 
 
 def redis_cache(
-    *,
     limit: Optional[int] = None,
+    *,
     expire: Optional[int] = None,
     is_method: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
@@ -116,8 +119,8 @@ def redis_cache(
 
 
 def memory_cache(
-    *,
     limit: Optional[int] = None,
+    *,
     expire: Optional[int] = None,
     is_method: bool = False,
     dependency: Optional[List[CacheDependency]] = None,

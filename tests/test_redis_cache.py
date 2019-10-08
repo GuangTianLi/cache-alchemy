@@ -10,7 +10,7 @@ class RedisCacheTestCase(CacheTestCase):
     def test_cache_function(self):
         call_mock = Mock()
 
-        @redis_cache()
+        @redis_cache
         def add(a: int, b: int = 2) -> int:
             call_mock()
             return a + b
@@ -69,7 +69,7 @@ class RedisCacheTestCase(CacheTestCase):
 
         class Tmp:
             @staticmethod
-            @redis_cache()
+            @redis_cache
             def add(a: int, b: int = 2) -> int:
                 call_mock()
                 return a + b
@@ -84,7 +84,7 @@ class RedisCacheTestCase(CacheTestCase):
     def test_cache_clear(self):
         call_mock = Mock()
 
-        @redis_cache()
+        @redis_cache
         def add(a: int, b: int = 2) -> int:
             call_mock()
             return a + b

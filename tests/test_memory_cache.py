@@ -25,7 +25,7 @@ class MemoryCacheTestCase(CacheTestCase):
         call_mock = Mock()
         result = object()
 
-        @memory_cache()
+        @memory_cache
         def add(a: int, b: int = 2) -> result:
             call_mock()
             return result
@@ -49,7 +49,7 @@ class MemoryCacheTestCase(CacheTestCase):
         call_mock = Mock()
         result = object()
 
-        @memory_cache()
+        @memory_cache
         def add(a: int, b: int = 2) -> result:
             self.assertEqual(config, DefaultConfig.get_current_config())
             call_mock()

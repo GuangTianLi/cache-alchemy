@@ -10,7 +10,7 @@ class DependencyTestCase(CacheTestCase):
     def test_function_dependency(self):
         call_mock = Mock()
 
-        @redis_cache()
+        @redis_cache
         def add(a, b):
             return a + b
 
