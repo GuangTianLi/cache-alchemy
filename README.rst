@@ -2,21 +2,21 @@
 Cache Alchemy
 ===============
 
-.. image:: https://img.shields.io/pypi/v/cache_alchemy.svg
-        :target: https://pypi.python.org/pypi/cache_alchemy
+.. image:: https://img.shields.io/pypi/v/cache-alchemy.svg
+        :target: https://pypi.python.org/pypi/cache-alchemy
 
-.. image:: https://img.shields.io/travis/GuangTianLi/cache_alchemy.svg
-        :target: https://travis-ci.org/GuangTianLi/cache_alchemy
+.. image:: https://img.shields.io/travis/GuangTianLi/cache-alchemy.svg
+        :target: https://travis-ci.org/GuangTianLi/cache-alchemy
 
-.. image:: https://readthedocs.org/projects/cache_alchemy/badge/?version=latest
-        :target: https://cache_alchemy.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/cache-alchemy/badge/?version=latest
+        :target: https://cache-alchemy.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://img.shields.io/pypi/pyversions/cache_alchemy.svg
-        :target: https://pypi.org/project/cache_alchemy/
+.. image:: https://img.shields.io/pypi/pyversions/cache-alchemy.svg
+        :target: https://pypi.org/project/cache-alchemy/
 
-.. image:: https://codecov.io/gh/GuangTianLi/cache_alchemy/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/GuangTianLi/cache_alchemy
+.. image:: https://codecov.io/gh/GuangTianLi/cache-alchemy/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/GuangTianLi/cache-alchemy
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
   :target: https://github.com/psf/black
@@ -27,7 +27,7 @@ The Python Cache Toolkit.
 
 
 * Free software: MIT license
-* Documentation: https://cache_alchemy.readthedocs.io/en/latest/
+* Documentation: https://cache-alchemy.readthedocs.io/en/latest/
 
 Installation
 ----------------
