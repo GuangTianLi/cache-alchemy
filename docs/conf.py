@@ -18,7 +18,8 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+
+sys.path.insert(0, os.path.abspath(".."))
 
 # -- General configuration ---------------------------------------------
 
@@ -112,15 +113,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -144,15 +142,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (
-        master_doc,
-        "cache_alchemy",
-        "Cache Alchemy Documentation",
-        [author],
-        1,
-    )
-]
+man_pages = [(master_doc, "cache_alchemy", "Cache Alchemy Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------

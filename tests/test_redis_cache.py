@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock
 
 from tests import CacheTestCase
-from cache_alchemy import redis_cache
+from cache_alchemy import redis_cache, method_redis_cache, property_redis_cache
 import time
 
 
@@ -11,6 +11,30 @@ class RedisCacheTestCase(CacheTestCase):
         call_mock = Mock()
 
         @redis_cache
+        def add(a: int, b: int = 2) -> int:
+            call_mock()
+            return a + b
+
+        self.assertEqual(add(1), 3)
+        self.assertEqual(1, call_mock.call_count)
+        self.assertEqual(1, add.cache.misses)
+        self.assertEqual(0, add.cache.hits)
+        self.assertEqual(add(a=1), 3)
+        self.assertEqual(2, add.cache.misses)
+        self.assertEqual(0, add.cache.hits)
+        self.assertEqual(2, call_mock.call_count)
+        self.assertEqual(add(a=2), 4)
+        self.assertEqual(3, call_mock.call_count)
+        self.assertEqual(3, add.cache.misses)
+        self.assertEqual(0, add.cache.hits)
+        add.cache_clear()
+        self.assertEqual(4, add(a=2))
+        self.assertEqual(4, call_mock.call_count)
+
+    def test_strict_cache_function(self):
+        call_mock = Mock()
+
+        @redis_cache(strict=True)
         def add(a: int, b: int = 2) -> int:
             call_mock()
             return a + b
@@ -35,7 +59,7 @@ class RedisCacheTestCase(CacheTestCase):
         call_mock = Mock()
 
         class Tmp:
-            @redis_cache(is_method=True)
+            @method_redis_cache
             def add(self, a: int, b: int = 2) -> int:
                 call_mock()
                 return a + b
@@ -52,7 +76,7 @@ class RedisCacheTestCase(CacheTestCase):
 
         class Tmp:
             @classmethod
-            @redis_cache(is_method=True)
+            @method_redis_cache
             def add(cls, a: int, b: int = 2) -> int:
                 call_mock()
                 return a + b
@@ -80,6 +104,22 @@ class RedisCacheTestCase(CacheTestCase):
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(Tmp.add(2), 4)
         self.assertEqual(call_mock.call_count, 2)
+
+    def test_cache_property(self):
+        call_mock = Mock()
+        name = "test"
+
+        class Tmp:
+            @property
+            @property_redis_cache
+            def name(self) -> str:
+                call_mock()
+                return name
+
+        self.assertEqual(Tmp().name, name)
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(Tmp().name, name)
+        self.assertEqual(call_mock.call_count, 1)
 
     def test_cache_clear(self):
         call_mock = Mock()
@@ -133,7 +173,7 @@ class RedisCacheTestCase(CacheTestCase):
 
         self.assertEqual(unexpired_add(1), 3)
         self.assertEqual(unexpired_add_call_mock.call_count, 1)
-        self.assertEqual(unexpired_add(a=1), 3)
+        self.assertEqual(unexpired_add(1), 3)
         self.assertEqual(unexpired_add_call_mock.call_count, 1)
 
 

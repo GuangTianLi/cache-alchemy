@@ -12,3 +12,23 @@ repos:
         )$
     language: python
     types: [python]
+
+  - id: lint
+    name: lint
+    entry: pipenv run lint
+    exclude: >
+        (?x)^(
+            docs/.+
+        )$
+    language: python
+    types: [python]
+
+  - id: test
+    name: test
+    entry: pipenv run test
+    exclude: >
+        (?x)^(
+            docs/.+
+        )$
+    language: python
+    types: [python]

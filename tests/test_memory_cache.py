@@ -34,11 +34,35 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(1), result)
         self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(a=1), result)
+        self.assertEqual(call_mock.call_count, 2)
+        self.assertEqual(add(2), result)
+        self.assertEqual(call_mock.call_count, 3)
+
+        add.cache_clear()
+        self.assertEqual(add(2), result)
+        self.assertEqual(call_mock.call_count, 4)
+
+    def test_distributed_strict_memory_cache(self):
+        call_mock = Mock()
+        result = object()
+
+        @memory_cache(strict=True)
+        def add(a: int, b: int = 2) -> result:
+            call_mock()
+            return result
+
+        self.assertEqual(result, add(1))
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(a=1), result)
+        self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(2), result)
         self.assertEqual(call_mock.call_count, 2)
 
         add.cache_clear()
-        self.assertEqual(add(2), result)
+        self.assertEqual(add(1, b=2), result)
         self.assertEqual(call_mock.call_count, 3)
 
     def test_memory_cache(self):
@@ -50,6 +74,30 @@ class MemoryCacheTestCase(CacheTestCase):
         result = object()
 
         @memory_cache
+        def add(a: int, b: int = 2) -> result:
+            self.assertEqual(config, DefaultConfig.get_current_config())
+            call_mock()
+            return result
+
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(a=1), result)
+        self.assertEqual(call_mock.call_count, 2)
+        self.assertEqual(add(2), result)
+        self.assertEqual(call_mock.call_count, 3)
+        add.cache_clear()
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 4)
+
+    def test_strict_memory_cache(self):
+        class TestMemoryCacheConfig(DefaultConfig):
+            CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
+
+        config = TestMemoryCacheConfig()
+        call_mock = Mock()
+        result = object()
+
+        @memory_cache(strict=True)
         def add(a: int, b: int = 2) -> result:
             self.assertEqual(config, DefaultConfig.get_current_config())
             call_mock()

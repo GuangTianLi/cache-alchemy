@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from types import FunctionType
 from typing import Any, Callable, ContextManager, Dict, Tuple, TypeVar, Union, cast
 
-from ..utils import generate_key
+from ..utils import strict_generate_key, fast_generate_key
 
 ReturnType = TypeVar("ReturnType")
 CacheFunctionType = Callable[..., ReturnType]
@@ -16,12 +16,14 @@ class BaseCache(ABC):
         expire: int,
         limit: int,
         is_method: bool = False,
+        strict=False,
     ):
         self.cached_function = cast(FunctionType, cached_function)
         self.is_method = is_method
         self.expire = expire
         self.limit = limit
         self.hits = self.misses = 0
+        self.generate_key = strict_generate_key if strict else fast_generate_key
 
     @property
     def function_hash(self) -> str:
@@ -59,7 +61,7 @@ class BaseCache(ABC):
     def make_key(
         self, args: Any, kwargs: Dict[str, Union[str, int]]
     ) -> Tuple[dict, dict, str]:
-        keyword_args, kwargs, key = generate_key(
+        keyword_args, kwargs, key = self.generate_key(
             args=args,
             kwargs=kwargs,
             func=self.cached_function,

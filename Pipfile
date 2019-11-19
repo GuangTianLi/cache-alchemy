@@ -26,8 +26,9 @@ python_version = "3.7"
 
 [scripts]
 pre_commit_init = "pre-commit install"
-test = "python -m unittest discover -s tests"
-format =  "bash -c 'black $@ && git add -u' --"
+test = "make test"
+format = "bash -c 'black $@ && git add -u' --"
+lint =  "make lint"
 
 [pipenv]
 allow_prereleases = true

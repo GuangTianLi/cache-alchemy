@@ -1,8 +1,9 @@
 from types import FunctionType
 from typing import Dict, Tuple
+from functools import lru_cache
 
 
-def generate_key(
+def strict_generate_key(
     args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
 ) -> Tuple[dict, dict, str]:
     """Generate function's arguments hash key from optionally typed positional and keyword arguments
@@ -70,3 +71,15 @@ def generate_key(
         for name, value in sorted(kwargs.items()):
             key += name + str(value)
     return keyword_args, kwargs, key
+
+
+def fast_generate_key(
+    args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
+) -> Tuple[dict, dict, str]:
+    key = args
+    if is_method:
+        key = args[1:]
+    if kwargs:
+        for item in kwargs.items():
+            key += item
+    return kwargs, {}, str(key)
