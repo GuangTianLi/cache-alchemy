@@ -25,6 +25,22 @@ To use Cache Alchemy in a project.
     def add(i: int, j: int) -> int:
         return i + j
 
+    class Foo:
+        x = 2
+
+        @classmethod
+        @method_redis_cache
+        def add(cls, y: int) -> int:
+            return cls.x + b
+
+        @method_redis_cache
+        def pow(self, y: int) -> int:
+            return pow(self.x, y)
+
+        @property
+        @property_redis_cache
+        def name(self) -> int:
+            return self.x
 
 Configuration
 ==============================================
