@@ -13,7 +13,7 @@ FunctionType = Callable[..., ReturnType]
 class DistributedCache(BaseCache):
     def __init__(self, *, cached_function: FunctionType, **kwargs):
         super().__init__(cached_function=cached_function, **kwargs)
-        self.client = DefaultConfig.get_current_config().client
+        self.client = DefaultConfig.get_current_config().cache_redis_client
 
     def get(self, *args, **kwargs) -> ReturnType:
         keyword_args, kwargs, cache_key = self.make_key(args, kwargs)

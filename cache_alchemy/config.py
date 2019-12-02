@@ -27,7 +27,7 @@ class DefaultConfig(BaseConfig):
     CACHE_ALCHEMY_DEFAULT_EXPIRE = 60 * 60 * 24
 
     #: Need to be assigned after init, if use distributed cache
-    client: "StrictRedis"
+    cache_redis_client: "StrictRedis"
 
     def __init__(self):
         super().__init__()
