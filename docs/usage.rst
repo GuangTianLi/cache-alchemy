@@ -15,7 +15,7 @@ To use Cache Alchemy in a project.
     from redis import StrictRedis
 
     config = DefaultConfig()
-    config.cache_redis_client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
+    config.cache_redis_client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL, decode_responses=True)
 
     @memory_cache
     def add(i: complex, j: complex) -> complex:

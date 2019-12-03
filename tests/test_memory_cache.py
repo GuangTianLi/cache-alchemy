@@ -71,6 +71,7 @@ class MemoryCacheTestCase(CacheTestCase):
             call_mock()
             return result
 
+        add.cache_clear()
         self.assertEqual(result, add(1))
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(1), result)

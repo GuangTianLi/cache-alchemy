@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 ipython = "*"
 ipdb = "*"
-black = "*"
+black = "==19.10b0"
 pre-commit = "*"
 watchdog = "*"
 sphinx = "*"

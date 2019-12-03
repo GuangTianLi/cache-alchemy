@@ -2,6 +2,12 @@
 History
 =======
 
+0.2.* (2019)
+------------------
+
+* Support Partially Clear Cache with Arguments
+* Cache Redis Client Must Decode Responses
+
 0.1.* (2019)
 ------------------
 

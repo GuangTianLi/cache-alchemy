@@ -49,7 +49,7 @@ Example
     from redis import StrictRedis
 
     config = DefaultConfig()
-    config.client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
+    config.client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL, decode_responses=True)
 
     @memory_cache
     def add(i: complex, j: complex) -> complex:

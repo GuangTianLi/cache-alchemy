@@ -16,6 +16,7 @@ class RedisCacheTestCase(CacheTestCase):
             call_mock()
             return a + b
 
+        add.cache_clear()
         self.assertEqual(add(1), 3)
         self.assertEqual(1, call_mock.call_count)
         self.assertEqual(1, add.cache.misses)

@@ -1,5 +1,5 @@
 import json
-from typing import Callable, TypeVar, Union
+from typing import Callable, TypeVar, Optional
 
 from configalchemy.types import JsonSerializable
 
@@ -18,7 +18,7 @@ class DistributedCache(BaseCache):
     def get(self, *args, **kwargs) -> ReturnType:
         keyword_args, kwargs, cache_key = self.make_key(args, kwargs)
         with self.cache_context(cache_key):
-            result = self.client.get(cache_key)
+            result: Optional[str] = self.client.get(cache_key)  # type: ignore
             if result is None:
                 with self.miss_context(cache_key):
                     value = self.cached_function(*args, **keyword_args, **kwargs)
@@ -45,7 +45,7 @@ class DistributedCache(BaseCache):
 
     def cache_clear(self, args: tuple, kwargs: dict) -> bool:
         if args or kwargs:
-            pattern = self.make_key_pattern(args=args, kwargs=kwargs,)
+            pattern = self.make_key_pattern(args=args, kwargs=kwargs)
             delete_keys = list(
                 filter(pattern.match, self.client.smembers(self.namespace))
             )
@@ -53,7 +53,9 @@ class DistributedCache(BaseCache):
                 self.client.delete(*delete_keys)
         else:
             with self.client.pipeline() as pipe:
-                pipe.delete(*self.client.smembers(self.namespace))
+                delete_keys = self.client.smembers(self.namespace)
+                if delete_keys:
+                    pipe.delete(*delete_keys)
                 pipe.delete(self.namespace)
                 pipe.srem(self.namespace_set, self.namespace)
                 pipe.execute()
@@ -62,7 +64,5 @@ class DistributedCache(BaseCache):
     def process_value(self, value: ReturnType) -> str:
         return json.dumps(value)
 
-    def process_result(self, result: Union[str, bytes]) -> ReturnType:
-        if isinstance(result, bytes):
-            result = result.decode()
+    def process_result(self, result: str) -> ReturnType:
         return json.loads(result)
