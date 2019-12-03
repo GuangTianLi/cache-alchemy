@@ -8,6 +8,7 @@ from cache_alchemy import (
     property_memory_cache,
 )
 from cache_alchemy.lru_dict import LRUDict
+from cache_alchemy.utils import UnsupportedError
 from tests import CacheTestCase
 
 
@@ -25,6 +26,8 @@ class MemoryCacheTestCase(CacheTestCase):
         cached_tmp = memory_cache(limit=-1)(tmp)
         self.assertIsInstance(cached_tmp.cache.cache_pool, dict)
         self.assertNotIsInstance(cached_tmp.cache.cache_pool, LRUDict)
+        with self.assertRaises(UnsupportedError):
+            cached_tmp.cache_clear(1)
 
     def test_cache_class_method(self):
         call_mock = Mock()
@@ -126,6 +129,49 @@ class MemoryCacheTestCase(CacheTestCase):
         add.cache_clear()
         self.assertEqual(add(1), result)
         self.assertEqual(call_mock.call_count, 4)
+
+    def test_cache_clear_with_pattern(self):
+        class TestMemoryCacheConfig(DefaultConfig):
+            CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
+
+        config = TestMemoryCacheConfig()
+        call_mock = Mock()
+        result = object()
+
+        @memory_cache(strict=True)
+        def add(a: int, b: int = 2) -> result:
+            self.assertEqual(config, DefaultConfig.get_current_config())
+            call_mock()
+            return result
+
+        add(1)
+        self.assertEqual(1, call_mock.call_count)
+        add(a=2)
+        self.assertEqual(2, call_mock.call_count)
+        add.cache_clear(a=1)
+        add(2)
+        self.assertEqual(2, call_mock.call_count)
+        add(1)
+        self.assertEqual(3, call_mock.call_count)
+
+    def test_distributed_strict_memory_cache_clear_with_pattern(self):
+        call_mock = Mock()
+        result = object()
+
+        @memory_cache(strict=True)
+        def add(a: int, b: int = 2) -> result:
+            call_mock()
+            return result
+
+        add(1)
+        self.assertEqual(1, call_mock.call_count)
+        add(a=2)
+        self.assertEqual(2, call_mock.call_count)
+        add.cache_clear(a=1)
+        add(2)
+        self.assertEqual(2, call_mock.call_count)
+        add(1)
+        self.assertEqual(3, call_mock.call_count)
 
     def test_strict_memory_cache(self):
         class TestMemoryCacheConfig(DefaultConfig):

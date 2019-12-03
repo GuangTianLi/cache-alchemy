@@ -43,12 +43,18 @@ class DistributedCache(BaseCache):
         pipe.sadd(self.namespace, key)
         pipe.execute()
 
-    def cache_clear(self) -> bool:
-        with self.client.pipeline() as pipe:
-            pipe.delete(*self.client.smembers(self.namespace))
-            pipe.delete(self.namespace)
-            pipe.srem(self.namespace_set, self.namespace)
-            pipe.execute()
+    def cache_clear(self, args: tuple, kwargs: dict) -> bool:
+        if args or kwargs:
+            pattern = self.make_key_pattern(args=args, kwargs=kwargs,)
+            self.client.delete(
+                *(filter(pattern.match, self.client.smembers(self.namespace)))
+            )
+        else:
+            with self.client.pipeline() as pipe:
+                pipe.delete(*self.client.smembers(self.namespace))
+                pipe.delete(self.namespace)
+                pipe.srem(self.namespace_set, self.namespace)
+                pipe.execute()
         return True
 
     def process_value(self, value: ReturnType) -> str:

@@ -15,7 +15,7 @@ To use Cache Alchemy in a project.
     from redis import StrictRedis
 
     config = DefaultConfig()
-    config.client = StrictRedis.from_url(config.cache_alchemy_REDIS_URL)
+    config.cache_redis_client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
 
     @memory_cache
     def add(i: complex, j: complex) -> complex:
@@ -63,7 +63,7 @@ By setting ``CACHE_ALCHEMY_MEMORY_BACKEND`` to ``cache_alchemy.backends.memory.M
     from cache_alchemy.config import DefaultConfig
 
     class CacheConfig(DefaultConfig):
-        cache_alchemy_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
+        CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
 
     config = CacheConfig()
 

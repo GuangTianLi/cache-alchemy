@@ -1,8 +1,8 @@
 from timeit import timeit
 
-from cache_alchemy.utils import fast_generate_key, strict_generate_key
+from cache_alchemy.utils import generate_fast_key, generate_strict_key
 
-__all__ = ["fast_generate_key", "strict_generate_key"]
+__all__ = ["generate_fast_key", "generate_strict_key"]
 tmp = lambda a, b=1, *, c, d=2, **kwd: ...
 
 

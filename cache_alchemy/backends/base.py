@@ -1,8 +1,24 @@
+import re
 from abc import ABC, abstractmethod
 from types import FunctionType
-from typing import Any, Callable, ContextManager, Dict, Tuple, TypeVar, Union, cast
+from typing import (
+    Any,
+    Callable,
+    ContextManager,
+    Dict,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    Pattern,
+)
 
-from ..utils import strict_generate_key, fast_generate_key
+from ..utils import (
+    generate_strict_key,
+    generate_fast_key,
+    generate_strict_key_pattern,
+    generate_fast_key_pattern,
+)
 
 ReturnType = TypeVar("ReturnType")
 CacheFunctionType = Callable[..., ReturnType]
@@ -23,7 +39,10 @@ class BaseCache(ABC):
         self.expire = expire
         self.limit = limit
         self.hits = self.misses = 0
-        self.generate_key = strict_generate_key if strict else fast_generate_key
+        self.generate_key = generate_strict_key if strict else generate_fast_key
+        self.generate_key_pattern = (
+            generate_strict_key_pattern if strict else generate_fast_key_pattern
+        )
 
     @property
     def function_hash(self) -> str:
@@ -46,7 +65,7 @@ class BaseCache(ABC):
         ...
 
     @abstractmethod
-    def cache_clear(self) -> bool:  # pragma: no cover
+    def cache_clear(self, args: tuple, kwargs: dict) -> bool:  # pragma: no cover
         ...
 
     def cache_context(self, key: str) -> ContextManager:
@@ -68,6 +87,17 @@ class BaseCache(ABC):
             is_method=self.is_method,
         )
         return keyword_args, kwargs, f"{self.namespace}:{key}"
+
+    def make_key_pattern(
+        self, args: Any, kwargs: Dict[str, Union[str, int]]
+    ) -> Pattern:
+        pattern = self.generate_key_pattern(
+            args=args,
+            kwargs=kwargs,
+            func=self.cached_function,
+            is_method=self.is_method,
+        )
+        return re.compile(f"{re.escape(self.namespace)}:{pattern}", re.DOTALL)
 
     def __call__(self, *args, **kwargs):
         return self.get(*args, **kwargs)

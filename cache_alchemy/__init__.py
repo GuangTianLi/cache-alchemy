@@ -87,10 +87,10 @@ def cache(
         def wrapper(*args, **kwargs):
             return cache(*args, **kwargs)
 
-        def cache_clear():
+        def cache_clear(*args, **kwargs):
             """Clear the cache and cache statistics"""
-            cache.cache_clear()
-            CacheDependency.dependent_cache_clear(cache)
+            cache.cache_clear(args, kwargs)
+            CacheDependency.dependent_cache_clear(cache, args, kwargs)
 
         for item in dependency:
             item.cache_objects.add(cache)

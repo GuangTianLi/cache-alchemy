@@ -20,10 +20,10 @@ class CacheDependency:
         return cls.all_dependencies.get(ident, [])
 
     @classmethod
-    def dependent_cache_clear(cls, ident: Hashable):
+    def dependent_cache_clear(cls, ident: Hashable, args: tuple, kwargs: dict):
         for dependency in cls.find_dependencies(ident):
             for cache in dependency.cache_objects:
-                cache.cache_clear()
+                cache.cache_clear(args, kwargs)
 
 
 class FunctionCacheDependency(CacheDependency):

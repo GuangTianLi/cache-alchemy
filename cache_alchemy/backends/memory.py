@@ -47,8 +47,13 @@ class MemoryCache(BaseCache):
         timestamp = int(time.time()) + self.expire
         self.cache_pool[key] = CacheItem(timestamp=timestamp, value=value)
 
-    def cache_clear(self) -> bool:
-        self.cache_pool.clear()
+    def cache_clear(self, args: tuple, kwargs: dict) -> bool:
+        if args or kwargs:
+            pattern = self.make_key_pattern(args=args, kwargs=kwargs,)
+            for key in filter(pattern.match, list(self.cache_pool.keys())):
+                del self.cache_pool[key]
+        else:
+            self.cache_pool.clear()
         return True
 
 

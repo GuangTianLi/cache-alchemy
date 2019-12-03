@@ -1,9 +1,10 @@
+import time
 import unittest
 from unittest.mock import Mock
 
-from tests import CacheTestCase
 from cache_alchemy import redis_cache, method_redis_cache, property_redis_cache
-import time
+from cache_alchemy.utils import UnsupportedError
+from tests import CacheTestCase
 
 
 class RedisCacheTestCase(CacheTestCase):
@@ -30,6 +31,41 @@ class RedisCacheTestCase(CacheTestCase):
         add.cache_clear()
         self.assertEqual(4, add(a=2))
         self.assertEqual(4, call_mock.call_count)
+
+    def test_cache_clear(self):
+        call_mock = Mock()
+
+        @redis_cache
+        def add(a: int, b: int = 2) -> int:
+            call_mock()
+            return a + b
+
+        self.assertEqual(add(1), 3)
+        self.assertEqual(call_mock.call_count, 1)
+        add.cache_clear()
+        self.assertEqual(add(a=1), 3)
+        self.assertEqual(call_mock.call_count, 2)
+
+        with self.assertRaises(UnsupportedError):
+            add.cache_clear(a=1)
+
+    def test_cache_clear_with_pattern(self):
+        call_mock = Mock()
+
+        @redis_cache(strict=True)
+        def add(a: int, b: int = 2) -> int:
+            call_mock()
+            return a + b
+
+        add(1)
+        self.assertEqual(1, call_mock.call_count)
+        add(a=2)
+        self.assertEqual(2, call_mock.call_count)
+        add.cache_clear(a=1)
+        add(2)
+        self.assertEqual(2, call_mock.call_count)
+        add(1)
+        self.assertEqual(3, call_mock.call_count)
 
     def test_strict_cache_function(self):
         call_mock = Mock()
@@ -120,20 +156,6 @@ class RedisCacheTestCase(CacheTestCase):
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(Tmp().name, name)
         self.assertEqual(call_mock.call_count, 1)
-
-    def test_cache_clear(self):
-        call_mock = Mock()
-
-        @redis_cache
-        def add(a: int, b: int = 2) -> int:
-            call_mock()
-            return a + b
-
-        self.assertEqual(add(1), 3)
-        self.assertEqual(call_mock.call_count, 1)
-        add.cache_clear()
-        self.assertEqual(add(a=1), 3)
-        self.assertEqual(call_mock.call_count, 2)
 
     def test_redis_cache_limit(self):
         call_mock = Mock()

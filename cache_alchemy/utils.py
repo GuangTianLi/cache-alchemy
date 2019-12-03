@@ -1,9 +1,14 @@
+import re
 from types import FunctionType
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Pattern
 
 
-def strict_generate_key(
-    args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
+class UnsupportedError(ValueError):
+    pass
+
+
+def generate_strict_key(
+    *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
 ) -> Tuple[dict, dict, str]:
     """Generate function's arguments hash key from optionally typed positional and keyword arguments
     """
@@ -37,20 +42,35 @@ def strict_generate_key(
     key = ""
 
     start = 1 if is_method else 0
-
+    args = args[start:]
+    positional = positional[start:]
     # Non-keyword-only parameters w/o defaults.
-    non_default_count = pos_count - pos_default_count
-    for value, name in zip(args[start:], positional[start:non_default_count]):
-        key += name + str(value)
-    for name in positional[len(args) : non_default_count]:
-        value = kwargs.pop(name)
-        keyword_args[name] = value
-        key += name + str(value)
-    # ... w/ defaults.
-    for offset, name in enumerate(positional[non_default_count:]):
-        value = kwargs.pop(name, defaults[offset])
-        keyword_args[name] = value
-        key += name + str(value)
+    non_default_count = pos_count - pos_default_count - start
+    while args and non_default_count:
+        key += positional[0] + str(args[0])
+        args = args[1:]
+        non_default_count -= 1
+        positional = positional[1:]
+
+    while args and positional:
+        key += positional[0] + str(args[0])
+        args = args[1:]
+        defaults = defaults[1:]
+        positional = positional[1:]
+
+    while non_default_count:
+        value = kwargs.pop(positional[0])
+        key += positional[0] + str(value)
+        keyword_args[positional[0]] = value
+        positional = positional[1:]
+        non_default_count -= 1
+
+    while defaults:
+        value = kwargs.pop(positional[0], defaults[0])
+        keyword_args[positional[0]] = value
+        key += positional[0] + str(value)
+        defaults = defaults[1:]
+        positional = positional[1:]
 
     # *args
     if func_code.co_flags & 4:
@@ -72,8 +92,58 @@ def strict_generate_key(
     return keyword_args, kwargs, key
 
 
-def fast_generate_key(
-    args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
+def generate_strict_key_pattern(
+    *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False,
+) -> str:
+    func_code = getattr(func, "__wrapped__", func).__code__
+    pos_count = func_code.co_argcount
+    arg_names = func_code.co_varnames
+    positional = tuple(arg_names[:pos_count])
+    keyword_only_count = func_code.co_kwonlyargcount
+    keyword_only = arg_names[pos_count : (pos_count + keyword_only_count)]
+    fillvalue = r".*?"
+    key = ""
+
+    start = 1 if is_method else 0
+    args = args[start:]
+    positional = positional[start:]
+
+    while positional:
+        name = positional[0]
+        if args:
+            key += name + re.escape(str(args[0]))
+            args = args[1:]
+        elif positional[0] in kwargs:
+            key += name + re.escape(str(kwargs.pop(name)))
+        else:
+            key += name + fillvalue
+        positional = positional[1:]
+
+    # *args
+    if func_code.co_flags & 4:
+        arg_index = pos_count + keyword_only_count
+        name = arg_names[arg_index]
+        for sub_index, value in enumerate(args[arg_index:]):
+            key += f"{name}{sub_index}" + re.escape(str(value))
+        key += fillvalue
+
+    # Keyword-only parameters.
+    for name in keyword_only:
+        if name in kwargs:
+            key += name + re.escape(str(kwargs.pop(name)))
+        else:
+            key += name + fillvalue
+
+    # **kwargs
+    if func_code.co_flags & 8:
+        for name, value in sorted(kwargs.items()):
+            key += name + re.escape(str(value))
+        key += fillvalue
+    return f"{key}$"
+
+
+def generate_fast_key(
+    *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
 ) -> Tuple[dict, dict, str]:
     key = args
     if is_method:
@@ -82,3 +152,9 @@ def fast_generate_key(
         for item in kwargs.items():
             key += item
     return kwargs, {}, str(key)
+
+
+def generate_fast_key_pattern(
+    *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False,
+) -> str:
+    raise UnsupportedError("fast hash not support pattern delete")
