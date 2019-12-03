@@ -66,6 +66,7 @@ class RedisCacheTestCase(CacheTestCase):
         self.assertEqual(2, call_mock.call_count)
         add(1)
         self.assertEqual(3, call_mock.call_count)
+        add.cache_clear(a=3)
 
     def test_strict_cache_function(self):
         call_mock = Mock()

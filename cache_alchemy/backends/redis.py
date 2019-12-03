@@ -46,9 +46,11 @@ class DistributedCache(BaseCache):
     def cache_clear(self, args: tuple, kwargs: dict) -> bool:
         if args or kwargs:
             pattern = self.make_key_pattern(args=args, kwargs=kwargs,)
-            self.client.delete(
-                *(filter(pattern.match, self.client.smembers(self.namespace)))
+            delete_keys = list(
+                filter(pattern.match, self.client.smembers(self.namespace))
             )
+            if delete_keys:
+                self.client.delete(*delete_keys)
         else:
             with self.client.pipeline() as pipe:
                 pipe.delete(*self.client.smembers(self.namespace))
