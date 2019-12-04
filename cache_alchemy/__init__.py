@@ -113,6 +113,7 @@ def redis_cache(
     is_method: bool = False,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
 ) -> CacheDecoratorType:
     return cache(
         limit=limit,
@@ -121,6 +122,7 @@ def redis_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_REDIS_BACKEND,
         dependency=dependency or [],
+        **kwargs,
     )
 
 
@@ -131,6 +133,7 @@ def memory_cache(
     is_method: bool = False,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
 ) -> CacheDecoratorType:
     return cache(
         limit=limit,
@@ -139,6 +142,7 @@ def memory_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_MEMORY_BACKEND,
         dependency=dependency or [],
+        **kwargs,
     )
 
 
@@ -148,6 +152,7 @@ def method_memory_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
 ) -> CacheDecoratorType:
     return cache(
         limit=limit,
@@ -156,6 +161,7 @@ def method_memory_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_MEMORY_BACKEND,
         dependency=dependency or [],
+        **kwargs,
     )
 
 
@@ -165,6 +171,7 @@ def method_redis_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
 ) -> CacheDecoratorType:
     return cache(
         limit=limit,
@@ -173,6 +180,7 @@ def method_redis_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_REDIS_BACKEND,
         dependency=dependency or [],
+        **kwargs,
     )
 
 
@@ -182,6 +190,7 @@ def property_memory_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
 ) -> CacheDecoratorType:
     return cache(
         limit=limit,
@@ -190,6 +199,7 @@ def property_memory_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_MEMORY_BACKEND,
         dependency=dependency or [],
+        **kwargs,
     )
 
 
@@ -199,6 +209,7 @@ def property_redis_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
 ) -> CacheDecoratorType:
     return cache(
         limit=limit,
@@ -207,4 +218,5 @@ def property_redis_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_REDIS_BACKEND,
         dependency=dependency or [],
+        **kwargs,
     )
