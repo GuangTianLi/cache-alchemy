@@ -5,14 +5,19 @@ from fakeredis import FakeStrictRedis
 from cache_alchemy.config import DefaultConfig
 
 
-class TestRedisCacheConfig(DefaultConfig):
+class TestCacheConfig(DefaultConfig):
     ...
+
+
+def get_config():
+    config = TestCacheConfig()
+    config.cache_redis_client = FakeStrictRedis.from_url(
+        config.CACHE_ALCHEMY_REDIS_URL, decode_responses=True
+    )
+    return config
 
 
 class CacheTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = TestRedisCacheConfig()
-        self.config.cache_redis_client = FakeStrictRedis.from_url(
-            self.config.CACHE_ALCHEMY_REDIS_URL, decode_responses=True
-        )
+        self.config = get_config()
         self.config.cache_redis_client.flushdb()

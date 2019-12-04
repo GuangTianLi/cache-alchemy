@@ -1,8 +1,10 @@
 from unittest.mock import MagicMock
-
+from tests import get_config
 from cache_alchemy import redis_cache, memory_cache
 
 redis_call_mock = MagicMock()
+
+config = get_config()
 
 
 @redis_cache
