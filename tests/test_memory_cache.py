@@ -131,6 +131,16 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(add(1), result)
         self.assertEqual(call_mock.call_count, 4)
 
+    def test_cache_namespace_hash(self):
+        from tests import resource_a, resource_b
+
+        resource_a.memory_test()
+        resource_b.memory_test()
+        resource_a.memory_test()
+        resource_b.memory_test()
+        self.assertEqual(1, resource_a.memory_call_mock.call_count)
+        self.assertEqual(1, resource_b.memory_call_mock.call_count)
+
     def test_cache_clear_with_pattern(self):
         class TestMemoryCacheConfig(DefaultConfig):
             CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"

@@ -46,7 +46,7 @@ class BaseCache(ABC):
 
     @property
     def function_hash(self) -> str:
-        return f"{self.cached_function.__qualname__}"
+        return f"{self.cached_function.__module__}:{self.cached_function.__qualname__}:{self.cached_function.__code__.co_firstlineno}"
 
     @property
     def namespace(self) -> str:

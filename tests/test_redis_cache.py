@@ -33,6 +33,16 @@ class RedisCacheTestCase(CacheTestCase):
         self.assertEqual(4, add(a=2))
         self.assertEqual(4, call_mock.call_count)
 
+    def test_cache_namespace_hash(self):
+        from tests import resource_a, resource_b
+
+        resource_a.redis_test()
+        resource_b.redis_test()
+        resource_a.redis_test()
+        resource_b.redis_test()
+        self.assertEqual(1, resource_a.redis_call_mock.call_count)
+        self.assertEqual(1, resource_b.redis_call_mock.call_count)
+
     def test_cache_clear(self):
         call_mock = Mock()
 
