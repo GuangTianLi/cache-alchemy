@@ -1,23 +1,30 @@
-from threading import RLock as Lock
-from typing import Optional, Any
+from threading import Lock
+from typing import Any, Iterable
 
 
-class DoubleLink:
+def is_not_none(o):
+    return o is not None
+
+
+class DoubleLink(Iterable):
     __slots__ = ("prev", "next", "key", "result")
 
     def __init__(
-        self, prev=None, next=None, key: Optional[str] = None, result: Any = None
+        self, key: str = "", result: Any = None,
     ):
-        self.prev: DoubleLink = prev or self
-        self.next: DoubleLink = next or self
+        self.prev = self
+        self.next = self
         self.key = key
         self.result = result
 
     def __iter__(self):
-        if self.prev.result is None:
+        if not self.prev.key:
             return
-        yield self.prev.result
+        yield self.prev
         yield from self.prev
+
+    def __len__(self):
+        return sum(map(is_not_none, self))
 
     def __repr__(self):
         return repr(self.result)
@@ -27,7 +34,7 @@ class DoubleLink:
 
 
 class LRUDict(dict):
-    __slots__ = ("max_size", "root", "lock")
+    __slots__ = ("max_size", "root", "lock", "__weakref__")
 
     def __init__(self, max_size: int):
         if max_size <= 0:
@@ -65,7 +72,9 @@ class LRUDict(dict):
                 super().__setitem__(key, oldroot)
             else:
                 last = self.root.prev
-                link = DoubleLink(prev=last, next=self.root, key=key, result=value)
+                link = DoubleLink(key=key, result=value)
+                link.prev = last
+                link.next = self.root
                 last.next = self.root.prev = link
                 super().__setitem__(key, link)
 
@@ -86,3 +95,8 @@ class LRUDict(dict):
             return self[k]
         except KeyError:
             return default
+
+    def clear(self):
+        with self.lock:
+            self.root = DoubleLink()
+            super().clear()

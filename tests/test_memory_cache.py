@@ -1,12 +1,16 @@
 import unittest
 from unittest.mock import Mock
 
+from configalchemy.utils import import_reference
+
 from cache_alchemy import (
     memory_cache,
     DefaultConfig,
     method_memory_cache,
     property_memory_cache,
 )
+from cache_alchemy.backends.memory import MemoryCache
+from cache_alchemy.backends.memory import all_cache_pool
 from cache_alchemy.lru_dict import LRUDict
 from cache_alchemy.utils import UnsupportedError
 from tests import CacheTestCase
@@ -71,7 +75,7 @@ class MemoryCacheTestCase(CacheTestCase):
             call_mock()
             return result
 
-        add.cache_clear()
+        self.assertEqual(0, add.cache_clear())
         self.assertEqual(result, add(1))
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(1), result)
@@ -81,7 +85,7 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(add(2), result)
         self.assertEqual(call_mock.call_count, 3)
 
-        add.cache_clear()
+        self.assertEqual(3, add.cache_clear())
         self.assertEqual(add(2), result)
         self.assertEqual(call_mock.call_count, 4)
 
@@ -108,12 +112,19 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(call_mock.call_count, 3)
 
     def test_memory_cache(self):
+        all_cache_pool.clear()
+
         class TestMemoryCacheConfig(DefaultConfig):
             CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
 
         config = TestMemoryCacheConfig()
         call_mock = Mock()
         result = object()
+        cache_backend: MemoryCache = import_reference(
+            config.CACHE_ALCHEMY_MEMORY_BACKEND
+        )
+
+        self.assertEqual(set(), cache_backend.get_all_namespace())
 
         @memory_cache
         def add(a: int, b: int = 2) -> result:
@@ -121,15 +132,43 @@ class MemoryCacheTestCase(CacheTestCase):
             call_mock()
             return result
 
+        self.assertEqual(0, len(cache_backend.get_all_namespace()))
+
         self.assertEqual(add(1), result)
+        self.assertEqual(1, len(cache_backend.get_all_namespace()))
         self.assertEqual(call_mock.call_count, 1)
         self.assertEqual(add(a=1), result)
         self.assertEqual(call_mock.call_count, 2)
         self.assertEqual(add(2), result)
         self.assertEqual(call_mock.call_count, 3)
-        add.cache_clear()
+        self.assertEqual(3, add.cache_clear())
         self.assertEqual(add(1), result)
         self.assertEqual(call_mock.call_count, 4)
+        self.assertEqual(1, cache_backend.flush_cache())
+
+    def test_strict_memory_cache(self):
+        class TestMemoryCacheConfig(DefaultConfig):
+            CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
+
+        config = TestMemoryCacheConfig()
+        call_mock = Mock()
+        result = object()
+
+        @memory_cache(strict=True)
+        def add(a: int, b: int = 2) -> result:
+            self.assertEqual(config, DefaultConfig.get_current_config())
+            call_mock()
+            return result
+
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 1)
+        self.assertEqual(add(2), result)
+        self.assertEqual(call_mock.call_count, 2)
+        add.cache_clear()
+        self.assertEqual(add(1), result)
+        self.assertEqual(call_mock.call_count, 3)
 
     def test_cache_namespace_hash(self):
         from tests import resource_a, resource_b
@@ -159,7 +198,7 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(1, call_mock.call_count)
         add(a=2)
         self.assertEqual(2, call_mock.call_count)
-        add.cache_clear(a=1)
+        self.assertEqual(1, add.cache_clear(a=1))
         add(2)
         self.assertEqual(2, call_mock.call_count)
         add(1)
@@ -183,30 +222,6 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(2, call_mock.call_count)
         add(1)
         self.assertEqual(3, call_mock.call_count)
-
-    def test_strict_memory_cache(self):
-        class TestMemoryCacheConfig(DefaultConfig):
-            CACHE_ALCHEMY_MEMORY_BACKEND = "cache_alchemy.backends.memory.MemoryCache"
-
-        config = TestMemoryCacheConfig()
-        call_mock = Mock()
-        result = object()
-
-        @memory_cache(strict=True)
-        def add(a: int, b: int = 2) -> result:
-            self.assertEqual(config, DefaultConfig.get_current_config())
-            call_mock()
-            return result
-
-        self.assertEqual(add(1), result)
-        self.assertEqual(call_mock.call_count, 1)
-        self.assertEqual(add(1), result)
-        self.assertEqual(call_mock.call_count, 1)
-        self.assertEqual(add(2), result)
-        self.assertEqual(call_mock.call_count, 2)
-        add.cache_clear()
-        self.assertEqual(add(1), result)
-        self.assertEqual(call_mock.call_count, 3)
 
 
 if __name__ == "__main__":

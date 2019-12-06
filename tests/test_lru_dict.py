@@ -21,21 +21,30 @@ class LRUDictTestCase(unittest.TestCase):
         lru_dict = LRUDict(5)
         for index in range(5):
             lru_dict[index] = index
-        for index, value in zip(range(4, -1, -1), lru_dict.root):
-            self.assertEqual(index, value)
+        for index, link in zip(range(4, -1, -1), lru_dict.root):
+            self.assertEqual(index, link.result)
         for index in range(4, -1, -1):
             self.assertEqual(index, lru_dict[index])
-        for index, value in zip(range(5), lru_dict.root):
-            self.assertEqual(index, value)
+        for index, link in zip(range(5), lru_dict.root):
+            self.assertEqual(index, link.result)
         lru_dict[5] = 5
         self.assertTrue(4 not in lru_dict)
+
+    def test_clear(self):
+        lru_dict = LRUDict(5)
+        for index in range(5):
+            lru_dict[index] = index
+        lru_dict.clear()
+        self.assertEqual(0, len(lru_dict.root))
 
     def test_double_link(self):
         root = DoubleLink()
         last = root.prev
-        link = DoubleLink(prev=last, next=root, key="1", result=1)
+        link = DoubleLink(key="1", result=1)
+        link.prev = last
+        link.next = root
         root.prev = last.next = link
-        self.assertEqual([1], list(root))
+        self.assertEqual([link], list(root))
         self.assertEqual("1", str(link))
 
 

@@ -1,4 +1,4 @@
-from typing import Dict, Hashable, List, Set
+from typing import Dict, Hashable, List, Set, Optional
 from weakref import WeakSet
 
 from .backends.base import BaseCache, CacheFunctionType
@@ -20,10 +20,17 @@ class CacheDependency:
         return cls.all_dependencies.get(ident, [])
 
     @classmethod
-    def dependent_cache_clear(cls, ident: Hashable, args: tuple, kwargs: dict):
+    def dependent_cache_clear(
+        cls,
+        ident: Hashable,
+        args: Optional[tuple] = None,
+        kwargs: Optional[dict] = None,
+    ) -> int:
+        count = 0
         for dependency in cls.find_dependencies(ident):
             for cache in dependency.cache_objects:
-                cache.cache_clear(args, kwargs)
+                count += cache.cache_clear(args, kwargs)
+        return count
 
 
 class FunctionCacheDependency(CacheDependency):

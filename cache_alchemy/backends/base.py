@@ -8,9 +8,10 @@ from typing import (
     Dict,
     Tuple,
     TypeVar,
-    Union,
     cast,
     Pattern,
+    Set,
+    Optional,
 )
 
 from ..utils import (
@@ -46,15 +47,15 @@ class BaseCache(ABC):
 
     @property
     def function_hash(self) -> str:
-        return f"{self.cached_function.__module__}:{self.cached_function.__qualname__}:{self.cached_function.__code__.co_firstlineno}"
+        return f"{self.cached_function.__module__}:{self.cached_function.__qualname__}"
 
     @property
     def namespace(self) -> str:
-        return f"{self.__class__.__name__}:{self.function_hash}-keys"
+        return f"{self.__class__.__module__}:{self.__class__.__name__}:{self.function_hash}-keys"
 
-    @property
-    def namespace_set(self) -> str:
-        return f"{self.__class__.__name__}:all-keys"
+    @classmethod
+    def get_backend_namespace(cls) -> str:
+        return f"{cls.__module__}:{cls.__name__}:all-keys"
 
     @abstractmethod
     def get(self, *args, **kwargs) -> ReturnType:  # pragma: no cover
@@ -65,8 +66,23 @@ class BaseCache(ABC):
         ...
 
     @abstractmethod
-    def cache_clear(self, args: tuple, kwargs: dict) -> bool:  # pragma: no cover
+    def cache_clear(
+        self, args: Optional[tuple] = None, kwargs: Optional[dict] = None
+    ) -> int:  # pragma: no cover
         ...
+
+    @classmethod
+    @abstractmethod
+    def get_all_namespace(cls) -> Set[str]:  # pragma: no cover
+        ...
+
+    @classmethod
+    @abstractmethod
+    def flush_cache(cls) -> int:  # pragma: no cover
+        ...
+
+    def post_init(self):
+        pass
 
     def cache_context(self, key: str) -> ContextManager:
         self.hits += 1
@@ -77,27 +93,25 @@ class BaseCache(ABC):
         self.hits -= 1
         return self
 
-    def make_key(
-        self, args: Any, kwargs: Dict[str, Union[str, int]]
-    ) -> Tuple[dict, dict, str]:
+    def make_key(self, args: tuple, kwargs: Dict[str, Any]) -> Tuple[dict, dict, str]:
         keyword_args, kwargs, key = self.generate_key(
             args=args,
             kwargs=kwargs,
             func=self.cached_function,
             is_method=self.is_method,
         )
-        return keyword_args, kwargs, f"{self.namespace}:{key}"
+        return keyword_args, kwargs, f"{self.function_hash}:{key}"
 
     def make_key_pattern(
-        self, args: Any, kwargs: Dict[str, Union[str, int]]
+        self, args: Optional[tuple], kwargs: Optional[Dict[str, Any]]
     ) -> Pattern:
         pattern = self.generate_key_pattern(
-            args=args,
-            kwargs=kwargs,
+            args=args or tuple(),
+            kwargs=kwargs or {},
             func=self.cached_function,
             is_method=self.is_method,
         )
-        return re.compile(f"{re.escape(self.namespace)}:{pattern}", re.DOTALL)
+        return re.compile(f"{re.escape(self.function_hash)}:{pattern}", re.DOTALL)
 
     def __call__(self, *args, **kwargs):
         return self.get(*args, **kwargs)
