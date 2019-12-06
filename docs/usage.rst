@@ -4,7 +4,7 @@ Usage
 
 .. warning:: The cache decorator must be used after config initialized.
 
-.. warning:: The client must be assigned after config initialized if you want to use distributed cache.
+.. warning:: The cache_redis_client must be assigned after config initialized if you want to use distributed cache.
 
 To use Cache Alchemy in a project.
 

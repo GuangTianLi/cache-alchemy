@@ -2,6 +2,11 @@ cache_alchemy package
 =====================
 
 
+cache function
+----------------------------
+
+.. autofunction:: cache_alchemy.cache
+
 cache_alchemy.config module
 ----------------------------
 

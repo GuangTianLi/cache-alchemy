@@ -1,7 +1,6 @@
 """
 Caching framework.
 """
-
 __version__ = "0.2.2"
 
 from functools import wraps
@@ -12,6 +11,7 @@ from typing import Callable, List, Optional, cast, Type, TypeVar
 from .backends.base import BaseCache, CacheFunctionType
 from .config import DefaultConfig
 from .dependency import CacheDependency
+from .utils import UnsupportedError
 
 __all__ = ["redis_cache", "memory_cache", "cache", "CacheDecoratorType"]
 
@@ -56,9 +56,25 @@ def cache(
     dependency: List[CacheDependency],
     **kwargs,
 ) -> CacheDecoratorType:
-    """
+    """The base function to creat a cache object like this::
 
+        @cache(
+            limit=1000,
+            expire=60,
+            is_method=False,
+            strict=True,
+            backend="cache_alchemy.backends.memory.MemoryCache",
+            dependency=[],
+        )
+        def f(x, y):
+            pass
+
+    :param int expire: expire time with an integer value used as seconds.
     :param bool is_method: If *True*, the first argument will be ignored in generate cache key.
+    :param bool strict: If *False*, make a cache key in a way that is flat as possible rather than
+                        as a nested and strict structure that would support partially cache clear.
+                        it means that f(x=1, y=2) will now be treated as a distinct call from
+                        f(y=2, x=1) which will be cached separately.
     """
     config = DefaultConfig.get_current_config()
     module_path, class_name = backend.rsplit(".", 1)
@@ -89,6 +105,9 @@ def cache(
 
         def cache_clear(*args, **kwargs) -> int:
             """Clear the cache and cache statistics"""
+            if not strict and (args or kwargs):
+                raise UnsupportedError("fast hash not support pattern delete")
+
             return sum(
                 [
                     cache.cache_clear(args, kwargs),

@@ -6,6 +6,7 @@ History
 ------------------
 
 * Support Partially Clear Cache with Arguments
+* Support Flush Backend Cache
 * Cache Redis Client Must Decode Responses
 
 0.1.* (2019)
