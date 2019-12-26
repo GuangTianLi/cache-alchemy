@@ -12,8 +12,9 @@ from .backends.base import BaseCache, CacheFunctionType
 from .config import DefaultConfig
 from .dependency import CacheDependency
 from .utils import UnsupportedError
+from .lru import LRUDict
 
-__all__ = ["redis_cache", "memory_cache", "cache", "CacheDecoratorType"]
+__all__ = ["redis_cache", "memory_cache", "cache", "CacheDecoratorType", "LRUDict"]
 
 BackendCls = TypeVar("BackendCls", bound=BaseCache)
 

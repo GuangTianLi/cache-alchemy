@@ -11,7 +11,7 @@ from cache_alchemy import (
 )
 from cache_alchemy.backends.memory import MemoryCache
 from cache_alchemy.backends.memory import all_cache_pool
-from cache_alchemy.lru_dict import LRUDict
+from cache_alchemy.lru import LRUDict
 from cache_alchemy.utils import UnsupportedError
 from tests import CacheTestCase
 

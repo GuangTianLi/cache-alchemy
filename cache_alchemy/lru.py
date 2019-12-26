@@ -1,16 +1,18 @@
 from threading import Lock
-from typing import Any, Iterable
+from typing import Iterable, TypeVar, Dict
+
+_S_T = TypeVar("_S_T")
+_D_K = TypeVar("_D_K")
+_D_V = TypeVar("_D_V")
+
+_sentry = object()
 
 
-def is_not_none(o):
-    return o is not None
-
-
-class DoubleLink(Iterable):
+class DoubleLinkedList(Iterable):
     __slots__ = ("prev", "next", "key", "result")
 
     def __init__(
-        self, key: str = "", result: Any = None,
+        self, key, result=None,
     ):
         self.prev = self
         self.next = self
@@ -18,13 +20,16 @@ class DoubleLink(Iterable):
         self.result = result
 
     def __iter__(self):
-        if not self.prev.key:
+        if self.prev.key is _sentry:
             return
         yield self.prev
         yield from self.prev
 
+    def __hash__(self):
+        return hash(self.key)
+
     def __len__(self):
-        return sum(map(is_not_none, self))
+        return sum(map(lambda _: 1, self))
 
     def __repr__(self):
         return repr(self.result)
@@ -33,14 +38,14 @@ class DoubleLink(Iterable):
         return str(self.result)
 
 
-class LRUDict(dict):
+class LRUDict(Dict[_D_K, _D_V]):
     __slots__ = ("max_size", "root", "lock", "__weakref__")
 
     def __init__(self, max_size: int):
         if max_size <= 0:
             raise TypeError("Expected max_size to be larger than 0")
         self.max_size = max_size
-        self.root = DoubleLink()
+        self.root = DoubleLinkedList(key=_sentry)
         self.lock = Lock()
         super().__init__()
 
@@ -63,7 +68,7 @@ class LRUDict(dict):
                 # still adjusting the links.
                 self.root = oldroot.next
                 oldkey = self.root.key
-                self.root.key = self.root.result = None
+                self.root.key = self.root.result = _sentry
                 # Now update the cache dictionary.
                 del self[oldkey]
                 # Save the potentially reentrant cache[key] assignment
@@ -72,7 +77,7 @@ class LRUDict(dict):
                 super().__setitem__(key, oldroot)
             else:
                 last = self.root.prev
-                link = DoubleLink(key=key, result=value)
+                link = DoubleLinkedList(key=key, result=value)
                 link.prev = last
                 link.next = self.root
                 last.next = self.root.prev = link
@@ -98,5 +103,5 @@ class LRUDict(dict):
 
     def clear(self):
         with self.lock:
-            self.root = DoubleLink()
+            self.root = DoubleLinkedList(key=_sentry)
             super().clear()

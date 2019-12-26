@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, TypeVar, Set, Optional
 
 from .base import BaseCache
 from .redis import DistributedCache
-from ..lru_dict import LRUDict
+from ..lru import LRUDict
 
 ReturnType = TypeVar("ReturnType")
 FunctionType = Callable[..., ReturnType]
