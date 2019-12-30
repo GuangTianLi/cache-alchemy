@@ -46,10 +46,10 @@ Example
 
     from cache_alchemy import memory_cache, redis_cache
     from cache_alchemy.config import DefaultConfig
-    from redis import StrictRedis
+    from redis import Redis
 
     config = DefaultConfig()
-    config.client = StrictRedis.from_url(config.CACHE_ALCHEMY_REDIS_URL, decode_responses=True)
+    config.cache_redis_client = Redis.from_url(config.CACHE_ALCHEMY_REDIS_URL, decode_responses=True)
 
     @memory_cache
     def add(i: complex, j: complex) -> complex:

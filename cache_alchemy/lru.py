@@ -1,9 +1,5 @@
 from threading import Lock
-from typing import Iterable, TypeVar, Dict
-
-_S_T = TypeVar("_S_T")
-_D_K = TypeVar("_D_K")
-_D_V = TypeVar("_D_V")
+from typing import Iterable
 
 _sentry = object()
 
@@ -38,7 +34,7 @@ class DoubleLinkedList(Iterable):
         return str(self.result)
 
 
-class LRUDict(Dict[_D_K, _D_V]):
+class LRUDict(dict):
     __slots__ = ("max_size", "root", "lock", "__weakref__")
 
     def __init__(self, max_size: int):

@@ -225,7 +225,7 @@ class RedisCacheTestCase(CacheTestCase):
         self.assertEqual(add(1), 3)
         self.assertEqual(call_mock.call_count, 1)
         time.sleep(3)
-        self.assertEqual(add(a=1), 3)
+        self.assertEqual(add(1), 3)
         self.assertEqual(call_mock.call_count, 2)
 
         unexpired_add_call_mock = Mock()

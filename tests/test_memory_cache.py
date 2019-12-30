@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock
-
+import time
 from configalchemy.utils import import_reference
-
+from concurrent.futures import ProcessPoolExecutor
 from cache_alchemy import (
     memory_cache,
     DefaultConfig,
@@ -222,6 +222,20 @@ class MemoryCacheTestCase(CacheTestCase):
         self.assertEqual(2, call_mock.call_count)
         add(1)
         self.assertEqual(3, call_mock.call_count)
+
+    def test_memory_cache_expire(self):
+        call_mock = Mock()
+
+        @memory_cache(expire=1)
+        def add(a: int, b: int = 2) -> int:
+            call_mock()
+            return a + b
+
+        self.assertEqual(add(1), 3)
+        self.assertEqual(call_mock.call_count, 1)
+        time.sleep(3)
+        self.assertEqual(add(1), 3)
+        self.assertEqual(call_mock.call_count, 2)
 
 
 if __name__ == "__main__":

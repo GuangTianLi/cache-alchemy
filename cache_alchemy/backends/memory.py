@@ -1,6 +1,6 @@
 import time
 from typing import Any, Callable, Dict, TypeVar, Set, Optional
-
+from sys import maxsize
 from .base import BaseCache
 from .redis import DistributedCache
 from ..lru import LRUDict
@@ -87,11 +87,10 @@ class DistributedMemoryCache(MemoryCache, DistributedCache):
         return MemoryCache.get(self, *args, **kwargs)
 
     def set(self, key: str, value: Any) -> None:
-        self.client.sadd(self.get_backend_namespace(), self.namespace)
         timestamp = int(time.time())
         DistributedCache.set(self, key, timestamp)
-        self.cache_pool[key] = CacheItem(timestamp=timestamp, value=value)
+        self.cache_pool[key] = CacheItem(timestamp=timestamp + self.expire, value=value)
 
     def get_timestamp(self, cache_key: str) -> int:
-        timestamp = self.client.get(cache_key) or 0
+        timestamp = self.client.get(cache_key) or maxsize
         return int(timestamp)
