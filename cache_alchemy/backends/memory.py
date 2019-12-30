@@ -1,6 +1,6 @@
 import time
 from typing import Any, Callable, Dict, TypeVar, Set, Optional
-from sys import maxsize
+
 from .base import BaseCache
 from .redis import DistributedCache
 from ..lru import LRUDict
@@ -29,12 +29,11 @@ class MemoryCache(BaseCache):
             self.cache_pool = dict()
         else:
             self.cache_pool = LRUDict(self.limit)
-        self.post_init()
 
     def get(self, *args, **kwargs) -> ReturnType:
         keyword_args, kwargs, cache_key = self.make_key(args, kwargs)
         with self.cache_context(cache_key):
-            timestamp = self.get_timestamp(cache_key)
+            timestamp = self.get_timestamp()
             cache_info = self.cache_pool.get(cache_key)
             if cache_info and timestamp <= cache_info.timestamp:
                 return cache_info.value
@@ -44,13 +43,14 @@ class MemoryCache(BaseCache):
                     self.set(cache_key, value)
                     return value
 
-    def get_timestamp(self, cache_key: str) -> int:
+    def get_timestamp(self) -> int:
         return int(time.time())
 
     def set(self, key: str, value: Any) -> None:
         all_cache_pool[self.namespace] = self.cache_pool
-        timestamp = int(time.time()) + self.expire
-        self.cache_pool[key] = CacheItem(timestamp=timestamp, value=value)
+        self.cache_pool[key] = CacheItem(
+            timestamp=int(time.time()) + self.expire, value=value
+        )
 
     def cache_clear(
         self, args: Optional[tuple] = None, kwargs: Optional[dict] = None
@@ -82,15 +82,49 @@ class MemoryCache(BaseCache):
         all_cache_pool.pop(self.namespace, None)
 
 
-class DistributedMemoryCache(MemoryCache, DistributedCache):
+class DistributedMemoryCache(DistributedCache):
+    cache_pool: Dict[str, CacheItem]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.limit == -1:
+            self.cache_pool = dict()
+        else:
+            self.cache_pool = LRUDict(self.limit)
+
     def get(self, *args, **kwargs) -> ReturnType:
-        return MemoryCache.get(self, *args, **kwargs)
+        keyword_args, kwargs, cache_key = self.make_key(args, kwargs)
+        with self.cache_context(cache_key):
+            distributed_cache_timestamp: Optional[str] = self.client.get(cache_key)  # type: ignore
+            cache_info = self.cache_pool.get(cache_key)
+            if distributed_cache_timestamp is None:
+                # (first call in first process) or (cache expire)
+                with self.miss_context(cache_key):
+                    value = self.cached_function(*args, **keyword_args, **kwargs)
+                    item = CacheItem(value=value, timestamp=int(time.time()))
+                    self.cache_pool[cache_key] = item
+                    self.set(cache_key, item)
+                return value
+            else:
+                cache_timestamp = int(distributed_cache_timestamp)
+                if cache_info is None:
+                    # first call in other processes
+                    value = self.cached_function(*args, **keyword_args, **kwargs)
+                    self.cache_pool[cache_key] = CacheItem(
+                        value=value, timestamp=cache_timestamp
+                    )
+                    return value
+                elif cache_info.timestamp != cache_timestamp:
+                    # expire by other process reset cache timestamp
+                    with self.miss_context(cache_key):
+                        value = self.cached_function(*args, **keyword_args, **kwargs)
+                        cache_info.value = value
+                        cache_info.timestamp = cache_timestamp
+                        return cache_info.value
+                else:
+                    return cache_info.value
 
-    def set(self, key: str, value: Any) -> None:
-        timestamp = int(time.time())
-        DistributedCache.set(self, key, timestamp)
-        self.cache_pool[key] = CacheItem(timestamp=timestamp + self.expire, value=value)
-
-    def get_timestamp(self, cache_key: str) -> int:
-        timestamp = self.client.get(cache_key) or maxsize
-        return int(timestamp)
+    def set(self, key: str, value: CacheItem) -> None:
+        super().set(key, value.timestamp)
+        self.cache_pool[key] = value
+        all_cache_pool[self.namespace] = self.cache_pool

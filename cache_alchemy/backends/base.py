@@ -81,9 +81,6 @@ class BaseCache(ABC):
     def flush_cache(cls) -> int:  # pragma: no cover
         ...
 
-    def post_init(self):
-        pass
-
     def cache_context(self, key: str) -> ContextManager:
         self.hits += 1
         return self

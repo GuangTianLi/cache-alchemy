@@ -4,7 +4,7 @@ from weakref import ref
 from configalchemy import BaseConfig
 
 if TYPE_CHECKING:  # pragma: no cover
-    from redis import StrictRedis
+    from redis import Redis
 
 _current_config_ref = ref(object)
 
@@ -27,7 +27,7 @@ class DefaultConfig(BaseConfig):
     CACHE_ALCHEMY_DEFAULT_EXPIRE = 60 * 60 * 24
 
     #: Need to be assigned after init, if use distributed cache
-    cache_redis_client: "StrictRedis"
+    cache_redis_client: "Redis"
 
     def __init__(self):
         super().__init__()
