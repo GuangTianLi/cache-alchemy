@@ -1,4 +1,5 @@
 import unittest
+from typing import Type
 from unittest.mock import Mock
 import time
 from configalchemy.utils import import_reference
@@ -120,7 +121,7 @@ class MemoryCacheTestCase(CacheTestCase):
         config = TestMemoryCacheConfig()
         call_mock = Mock()
         result = object()
-        cache_backend: MemoryCache = import_reference(
+        cache_backend: Type[MemoryCache] = import_reference(
             config.CACHE_ALCHEMY_MEMORY_BACKEND
         )
 
@@ -132,6 +133,9 @@ class MemoryCacheTestCase(CacheTestCase):
             call_mock()
             return result
 
+        self.assertIn(
+            cache_backend.__name__, add.cache.make_key(args=(1,), kwargs={})[2]
+        )
         self.assertEqual(0, len(cache_backend.get_all_namespace()))
 
         self.assertEqual(add(1), result)

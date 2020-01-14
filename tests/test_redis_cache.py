@@ -1,5 +1,6 @@
 import time
 import unittest
+from typing import Type
 from unittest.mock import Mock
 
 from configalchemy.utils import import_reference
@@ -65,7 +66,7 @@ class RedisCacheTestCase(CacheTestCase):
 
     def test_cache_set(self):
         self.config.cache_redis_client.flushdb()
-        redis_cache_backend: DistributedCache = import_reference(
+        redis_cache_backend: Type[DistributedCache] = import_reference(
             self.config.CACHE_ALCHEMY_REDIS_BACKEND
         )
 
@@ -79,6 +80,9 @@ class RedisCacheTestCase(CacheTestCase):
         def mul(a: int, b: int = 2) -> int:
             return a * b
 
+        self.assertIn(
+            redis_cache_backend.__name__, add.cache.make_key(args=(1,), kwargs={})[2]
+        )
         self.assertEqual(0, len(redis_cache_backend.get_all_namespace()))
         self.assertEqual(0, redis_cache_backend.flush_cache())
         add(1)

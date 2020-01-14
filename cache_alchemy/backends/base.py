@@ -47,11 +47,11 @@ class BaseCache(ABC):
 
     @property
     def function_hash(self) -> str:
-        return f"{self.cached_function.__module__}:{self.cached_function.__qualname__}"
+        return f"{self.__class__.__name__}:{self.cached_function.__module__}:{self.cached_function.__qualname__}"
 
     @property
     def namespace(self) -> str:
-        return f"{self.__class__.__module__}:{self.__class__.__name__}:{self.function_hash}-keys"
+        return f"{self.__class__.__module__}:{self.function_hash}-keys"
 
     @classmethod
     def get_backend_namespace(cls) -> str:
