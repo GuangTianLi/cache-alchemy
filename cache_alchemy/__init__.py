@@ -70,6 +70,9 @@ def cache(
         def f(x, y):
             pass
 
+        # To clear cache
+        f.cache_clear()
+
     :param int expire: expire time with an integer value used as seconds.
     :param bool is_method: If *True*, the first argument will be ignored in generate cache key.
     :param bool strict: If *False*, make a cache key in a way that is flat as possible rather than

@@ -42,6 +42,9 @@ To use Cache Alchemy in a project.
         def name(self) -> int:
             return self.x
 
+    # Using decorated function to clear cache
+    add.cache_clear()
+
 Configuration
 ==============================================
 
