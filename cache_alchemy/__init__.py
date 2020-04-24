@@ -1,7 +1,7 @@
 """
 Caching framework.
 """
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 from functools import wraps
 from importlib import import_module
