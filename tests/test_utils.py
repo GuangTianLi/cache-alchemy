@@ -8,6 +8,7 @@ from cache_alchemy.utils import (
     generate_strict_key_pattern,
     UnsupportedError,
     generate_fast_key_pattern,
+    escape,
 )
 
 
@@ -171,13 +172,13 @@ class UtilsTestCase(unittest.TestCase):
                 ["a2b2"],
             ),
             (
-                f"cls{re.escape(str(Tmp))}a1b.*?",
+                f"cls{escape(str(Tmp))}a1b.*?",
                 dict(args=(Tmp, 1), kwargs=dict(), func=tmp.tmp_class_method.__func__),
                 [f"cls{Tmp}a1b1"],
                 [f"cls{Tmp}a2b1"],
             ),
             (
-                f"cls{re.escape(str(Tmp))}a1b2",
+                f"cls{escape(str(Tmp))}a1b2",
                 dict(
                     args=(Tmp, 1), kwargs=dict(b=2), func=tmp.tmp_class_method.__func__
                 ),
