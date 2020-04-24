@@ -12,9 +12,13 @@ _current_config_ref = ref(object)
 class DefaultConfig(BaseConfig):
     #: default redis url
     CACHE_ALCHEMY_REDIS_URL = "redis://127.0.0.1:6379/0"
-    #: redis cache backend - default: distributed cache which need assign client to config
-    CACHE_ALCHEMY_REDIS_BACKEND = "cache_alchemy.backends.redis.DistributedCache"
-    #: redis memory backend - default: distributed cache which need assign client to config
+    #: distributed json cache backend - default: distributed cache which need assign client to config
+    CACHE_ALCHEMY_JSON_BACKEND = "cache_alchemy.backends.json.DistributedJsonCache"
+    #: memory cache backend - default: distributed cache which need assign client to config
+    CACHE_ALCHEMY_PICKLE_BACKEND = (
+        "cache_alchemy.backends.pickle.DistributedPickleCache"
+    )
+    #: memory cache backend - default: distributed cache which need assign client to config
     CACHE_ALCHEMY_MEMORY_BACKEND = (
         "cache_alchemy.backends.memory.DistributedMemoryCache"
     )

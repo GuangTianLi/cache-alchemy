@@ -47,20 +47,20 @@ def generate_strict_key(
     # Non-keyword-only parameters w/o defaults.
     non_default_count = pos_count - pos_default_count - start
     while args and non_default_count:
-        key += positional[0] + str(args[0])
+        key += positional[0] + repr(args[0])
         args = args[1:]
         non_default_count -= 1
         positional = positional[1:]
 
     while args and positional:
-        key += positional[0] + str(args[0])
+        key += positional[0] + repr(args[0])
         args = args[1:]
         defaults = defaults[1:]
         positional = positional[1:]
 
     while non_default_count:
         value = kwargs.pop(positional[0])
-        key += positional[0] + str(value)
+        key += positional[0] + repr(value)
         keyword_args[positional[0]] = value
         positional = positional[1:]
         non_default_count -= 1
@@ -77,18 +77,18 @@ def generate_strict_key(
         arg_index = pos_count + keyword_only_count
         name = arg_names[arg_index]
         for sub_index, value in enumerate(args[arg_index:]):
-            key += f"{name}{sub_index}" + str(value)
+            key += f"{name}{sub_index}" + repr(value)
 
     # Keyword-only parameters.
     for name in keyword_only:
         value = kwargs.pop(name, kwdefaults.get(name))
         keyword_args[name] = value
-        key += name + str(value)
+        key += name + repr(value)
 
     # **kwargs
     if func_code.co_flags & 8:
         for name, value in sorted(kwargs.items()):
-            key += name + str(value)
+            key += name + repr(value)
     return keyword_args, kwargs, key
 
 
@@ -111,10 +111,10 @@ def generate_strict_key_pattern(
     while positional:
         name = positional[0]
         if args:
-            key += name + re.escape(str(args[0]))
+            key += name + re.escape(repr(args[0]))
             args = args[1:]
         elif positional[0] in kwargs:
-            key += name + re.escape(str(kwargs.pop(name)))
+            key += name + re.escape(repr(kwargs.pop(name)))
         else:
             key += name + fillvalue
         positional = positional[1:]
@@ -124,20 +124,20 @@ def generate_strict_key_pattern(
         arg_index = pos_count + keyword_only_count
         name = arg_names[arg_index]
         for sub_index, value in enumerate(args[arg_index:]):
-            key += f"{name}{sub_index}" + re.escape(str(value))
+            key += f"{name}{sub_index}" + re.escape(repr(value))
         key += fillvalue
 
     # Keyword-only parameters.
     for name in keyword_only:
         if name in kwargs:
-            key += name + re.escape(str(kwargs.pop(name)))
+            key += name + re.escape(repr(kwargs.pop(name)))
         else:
             key += name + fillvalue
 
     # **kwargs
     if func_code.co_flags & 8:
         for name, value in sorted(kwargs.items()):
-            key += name + re.escape(str(value))
+            key += name + re.escape(repr(value))
         key += fillvalue
     return f"{key}$"
 
@@ -151,7 +151,7 @@ def generate_fast_key(
     if kwargs:
         for item in kwargs.items():
             key += item
-    return kwargs, {}, str(key)
+    return kwargs, {}, repr(key)
 
 
 def generate_fast_key_pattern(

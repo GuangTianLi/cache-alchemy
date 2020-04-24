@@ -1,8 +1,7 @@
 import time
 from typing import Any, Callable, Dict, TypeVar, Set, Optional
 
-from .base import BaseCache
-from .redis import DistributedCache
+from .base import BaseCache, DistributedCache
 from ..lru import LRUDict
 
 ReturnType = TypeVar("ReturnType")

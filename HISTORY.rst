@@ -2,6 +2,12 @@
 History
 =======
 
+0.3.* (2020)
+------------------
+
+* Refactory redis cache to json cache
+* Support pickle Cache
+
 0.2.* (2019)
 ------------------
 

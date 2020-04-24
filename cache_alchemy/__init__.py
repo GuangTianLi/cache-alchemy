@@ -11,10 +11,8 @@ from typing import Callable, List, Optional, cast, Type, TypeVar
 from .backends.base import BaseCache, CacheFunctionType
 from .config import DefaultConfig
 from .dependency import CacheDependency
-from .utils import UnsupportedError
 from .lru import LRUDict
-
-__all__ = ["redis_cache", "memory_cache", "cache", "CacheDecoratorType", "LRUDict"]
+from .utils import UnsupportedError
 
 BackendCls = TypeVar("BackendCls", bound=BaseCache)
 
@@ -133,7 +131,7 @@ def cache(
     return decorating_function
 
 
-def redis_cache(
+def json_cache(
     limit: Optional[int] = None,
     *,
     expire: Optional[int] = None,
@@ -147,7 +145,45 @@ def redis_cache(
         expire=expire,
         is_method=is_method,
         strict=strict,
-        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_REDIS_BACKEND,
+        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_JSON_BACKEND,
+        dependency=dependency or [],
+        **kwargs,
+    )
+
+
+def method_json_cache(
+    limit: Optional[int] = None,
+    *,
+    expire: Optional[int] = None,
+    strict: bool = False,
+    dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
+) -> CacheDecoratorType:
+    return cache(
+        limit=limit,
+        expire=expire,
+        is_method=True,
+        strict=strict,
+        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_JSON_BACKEND,
+        dependency=dependency or [],
+        **kwargs,
+    )
+
+
+def property_json_cache(
+    limit: Optional[int] = None,
+    *,
+    expire: Optional[int] = None,
+    strict: bool = False,
+    dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
+) -> CacheDecoratorType:
+    return cache(
+        limit=limit,
+        expire=expire,
+        is_method=True,
+        strict=strict,
+        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_JSON_BACKEND,
         dependency=dependency or [],
         **kwargs,
     )
@@ -192,25 +228,6 @@ def method_memory_cache(
     )
 
 
-def method_redis_cache(
-    limit: Optional[int] = None,
-    *,
-    expire: Optional[int] = None,
-    strict: bool = False,
-    dependency: Optional[List[CacheDependency]] = None,
-    **kwargs,
-) -> CacheDecoratorType:
-    return cache(
-        limit=limit,
-        expire=expire,
-        is_method=True,
-        strict=strict,
-        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_REDIS_BACKEND,
-        dependency=dependency or [],
-        **kwargs,
-    )
-
-
 def property_memory_cache(
     limit: Optional[int] = None,
     *,
@@ -230,7 +247,27 @@ def property_memory_cache(
     )
 
 
-def property_redis_cache(
+def pickle_cache(
+    limit: Optional[int] = None,
+    *,
+    expire: Optional[int] = None,
+    is_method: bool = False,
+    strict: bool = False,
+    dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
+) -> CacheDecoratorType:
+    return cache(
+        limit=limit,
+        expire=expire,
+        is_method=is_method,
+        strict=strict,
+        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_PICKLE_BACKEND,
+        dependency=dependency or [],
+        **kwargs,
+    )
+
+
+def method_pickle_cache(
     limit: Optional[int] = None,
     *,
     expire: Optional[int] = None,
@@ -243,7 +280,26 @@ def property_redis_cache(
         expire=expire,
         is_method=True,
         strict=strict,
-        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_REDIS_BACKEND,
+        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_PICKLE_BACKEND,
+        dependency=dependency or [],
+        **kwargs,
+    )
+
+
+def property_pickle_cache(
+    limit: Optional[int] = None,
+    *,
+    expire: Optional[int] = None,
+    strict: bool = False,
+    dependency: Optional[List[CacheDependency]] = None,
+    **kwargs,
+) -> CacheDecoratorType:
+    return cache(
+        limit=limit,
+        expire=expire,
+        is_method=True,
+        strict=strict,
+        backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_PICKLE_BACKEND,
         dependency=dependency or [],
         **kwargs,
     )

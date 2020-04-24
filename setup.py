@@ -12,7 +12,7 @@ requirements = ["configalchemy"]
 
 setup_requirements = []
 
-test_requirements = ["fakeredis"]
+test_requirements = ["fakeredis", 'dataclasses>=0.6;python_version<"3.7"']
 
 
 setup(

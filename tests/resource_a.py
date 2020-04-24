@@ -1,14 +1,14 @@
 from unittest.mock import MagicMock
 from tests import get_config
-from cache_alchemy import redis_cache, memory_cache
+from cache_alchemy import json_cache, memory_cache
 
 redis_call_mock = MagicMock()
 
 config = get_config()
 
 
-@redis_cache
-def redis_test():
+@json_cache
+def json_test():
     redis_call_mock()
     return "test"
 

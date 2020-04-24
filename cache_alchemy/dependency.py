@@ -37,13 +37,13 @@ class FunctionCacheDependency(CacheDependency):
     """
     Examples:
 
-        @redis_cache()
+        @json_cache()
         def add(a, b):
             return a + b
 
         dependency = FunctionCacheDependency(add)
 
-        @redis_cache(dependency=[dependency])
+        @json_cache(dependency=[dependency])
         def add_and_double(a, b):
             return add(a, b) * 2
     """

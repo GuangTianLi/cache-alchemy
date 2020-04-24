@@ -1,9 +1,10 @@
+import time
 import unittest
 from typing import Type
 from unittest.mock import Mock
-import time
+
 from configalchemy.utils import import_reference
-from concurrent.futures import ProcessPoolExecutor
+
 from cache_alchemy import (
     memory_cache,
     DefaultConfig,
