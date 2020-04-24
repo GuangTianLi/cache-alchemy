@@ -1,6 +1,24 @@
 import re
 from types import FunctionType
-from typing import Dict, Tuple, Pattern
+from typing import Dict, Tuple
+
+# SPECIAL_CHARS
+# closing ')', '}' and ']'
+# '-' (a range in character set)
+# '&', '~', (extended character set operations)
+# '#' (comment) and WHITESPACE (ignored) in verbose mode
+_special_chars_map = {i: "\\" + chr(i) for i in b"()[]{}?*+-|^$\\.&~# \t\n\r\v\f"}
+
+
+def escape(pattern):
+    """
+    Escape special characters in a string.
+    """
+    if isinstance(pattern, str):
+        return pattern.translate(_special_chars_map)
+    else:
+        pattern = str(pattern, "latin1")
+        return pattern.translate(_special_chars_map).encode("latin1")
 
 
 class UnsupportedError(ValueError):
@@ -111,10 +129,10 @@ def generate_strict_key_pattern(
     while positional:
         name = positional[0]
         if args:
-            key += name + re.escape(repr(args[0]))
+            key += name + escape(repr(args[0]))
             args = args[1:]
         elif positional[0] in kwargs:
-            key += name + re.escape(repr(kwargs.pop(name)))
+            key += name + escape(repr(kwargs.pop(name)))
         else:
             key += name + fillvalue
         positional = positional[1:]
@@ -124,20 +142,20 @@ def generate_strict_key_pattern(
         arg_index = pos_count + keyword_only_count
         name = arg_names[arg_index]
         for sub_index, value in enumerate(args[arg_index:]):
-            key += f"{name}{sub_index}" + re.escape(repr(value))
+            key += f"{name}{sub_index}" + escape(repr(value))
         key += fillvalue
 
     # Keyword-only parameters.
     for name in keyword_only:
         if name in kwargs:
-            key += name + re.escape(repr(kwargs.pop(name)))
+            key += name + escape(repr(kwargs.pop(name)))
         else:
             key += name + fillvalue
 
     # **kwargs
     if func_code.co_flags & 8:
         for name, value in sorted(kwargs.items()):
-            key += name + re.escape(repr(value))
+            key += name + escape(repr(value))
         key += fillvalue
     return f"{key}$"
 
