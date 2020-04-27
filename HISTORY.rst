@@ -2,11 +2,12 @@
 History
 =======
 
-0.3.* (2020)
+0.4.* (2020)
 ------------------
 
 * Refactory redis cache to json cache
 * Support pickle Cache
+* Add backend class in function hash
 
 0.2.* (2019)
 ------------------
