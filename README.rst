@@ -44,25 +44,42 @@ Example
 
 .. code-block:: python
 
-    from cache_alchemy import memory_cache, json_cache
-    from cache_alchemy.config import DefaultConfig
+    import dataclasses
+
     from redis import Redis
+
+    from cache_alchemy import memory_cache, json_cache, pickle_cache
+    from cache_alchemy.config import DefaultConfig
 
     config = DefaultConfig()
     config.cache_redis_client = Redis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
+
+
+    @dataclasses.dataclass
+    class User:
+        name: str
+
+
+    @pickle_cache
+    def get(name: str) -> User:
+        return User(name=name)
+
 
     @memory_cache
     def add(i: complex, j: complex) -> complex:
         return i + j
 
+
     @json_cache
     def add(i: int, j: int) -> int:
         return i + j
 
+
 Features
 ----------
 
-- Distributed Cache Module
+- Distributed cache
+- Cache clear and partial clear with specific function parameter
 - Cache ``Json Serializable`` function return value with **json_cache**
 - Cache Python Object function return value with **pickle_cache**
 - Cache any function return value with **memory_cache**
