@@ -49,8 +49,7 @@ To use Cache Alchemy in a project.
 Json Cache
 ==============================================
 
-.. note:: Json related cache only support function which return the pure `JSON serializable object <https://www.json.org/>`_. Otherwise there is
-a different between return value and cached value which will cause some unexpected behavior. If you want to cache python object e.g dataclass, see :ref:`pickle-cache`.
+.. note:: Json related cache only support function which return the pure `JSON serializable object <https://www.json.org/>`_. Otherwise there is a different between return value and cached value which will cause some unexpected behavior. If you want to cache python object e.g dataclass, see :ref:`pickle-cache`.
 
 
 .. _pickle-cache:
@@ -117,3 +116,22 @@ By setting ``CACHE_ALCHEMY_MEMORY_BACKEND`` to ``cache_alchemy.backends.memory.M
     @memory_cache
     def add(i: complex, j: complex) -> complex:
         return i + j
+
+Define a cache dependency
+===========================
+
+Use cache dependency to declare dependency between two function.
+
+.. code-block:: python
+
+    @json_cache
+    def add(a, b):
+        return a + b
+
+    dependency = FunctionCacheDependency(add)
+
+    @json_cache(dependency=[dependency])
+    def add_and_double(a, b):
+        return add(a, b) * 2
+
+When cache of add has been cleared, add_and_double will clear cascade.

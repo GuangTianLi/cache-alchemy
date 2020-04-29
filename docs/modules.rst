@@ -1,7 +1,21 @@
-cache_alchemy
+API reference
 ===============
 
-.. toctree::
-   :maxdepth: 4
+Cache Function
+----------------------------
 
-   cache_alchemy
+.. autofunction:: cache_alchemy.cache
+
+DefaultConfig Object
+----------------------------
+
+.. automodule:: cache_alchemy.config
+    :members:
+    :show-inheritance:
+
+FunctionCacheDependency Object
+---------------------------------
+
+.. automodule:: cache_alchemy.dependency.FunctionCacheDependency
+    :members:
+    :show-inheritance:

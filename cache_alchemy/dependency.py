@@ -35,7 +35,7 @@ class CacheDependency:
 
 class FunctionCacheDependency(CacheDependency):
     """
-    Examples:
+    Examples::
 
         @json_cache()
         def add(a, b):

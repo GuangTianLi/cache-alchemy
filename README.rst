@@ -80,6 +80,7 @@ Features
 
 - Distributed cache
 - Cache clear and partial clear with specific function parameter
+- Cache clear cascade by dependency
 - Cache ``Json Serializable`` function return value with **json_cache**
 - Cache Python Object function return value with **pickle_cache**
 - Cache any function return value with **memory_cache**
