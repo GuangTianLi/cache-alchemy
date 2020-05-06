@@ -1,4 +1,3 @@
-import re
 from types import FunctionType
 from typing import Dict, Tuple
 
