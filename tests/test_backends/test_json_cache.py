@@ -94,7 +94,7 @@ class JsonCacheTestCase(CacheTestCase):
         self.assertEqual(2, len(json_cache_backend.get_all_namespace()))
         self.assertEqual(2, json_cache_backend.flush_cache())
 
-    def test_cache_clear_with_pattern(self):
+    def test_cache_clear_with_pattern_and_int_parameter(self):
         call_mock = Mock()
 
         @json_cache(strict=True)
@@ -112,6 +112,19 @@ class JsonCacheTestCase(CacheTestCase):
         add(1)
         self.assertEqual(3, call_mock.call_count)
         self.assertEqual(0, add.cache_clear(a=3))
+
+    def test_cache_clear_with_pattern_and_str_parameter(self):
+        call_mock = Mock()
+
+        @json_cache(strict=True)
+        def hello(name: str, status: str = "") -> str:
+            call_mock()
+            return ""
+
+        hello(name="world", status="test")
+        hello(name="world", status="prod")
+        self.assertEqual(2, call_mock.call_count)
+        self.assertEqual(1, hello.cache_clear(name="world", status="prod"))
 
     def test_strict_cache_function(self):
         call_mock = Mock()

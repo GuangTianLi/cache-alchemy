@@ -85,7 +85,7 @@ def generate_strict_key(
     while defaults:
         value = kwargs.pop(positional[0], defaults[0])
         keyword_args[positional[0]] = value
-        key += positional[0] + str(value)
+        key += positional[0] + repr(value)
         defaults = defaults[1:]
         positional = positional[1:]
 

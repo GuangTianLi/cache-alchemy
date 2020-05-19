@@ -34,6 +34,11 @@ class UtilsTestCase(unittest.TestCase):
             ("a1b1", dict(args=(1,), kwargs=dict(), func=lambda a, b=1: ...)),
             ("a1b1", dict(args=(), kwargs=dict(a=1), func=lambda a, b=1: ...)),
             ("a1b2", dict(args=(1,), kwargs=dict(b=2), func=lambda a, b=1: ...)),
+            ("a'1'b'2'", dict(args=("1",), kwargs=dict(b="2"), func=lambda a, b: ...)),
+            (
+                "a'1'b'2'",
+                dict(args=("1",), kwargs=dict(b="2"), func=lambda a, b="": ...),
+            ),
             ("a1b2", dict(args=(1,), kwargs=dict(b=2), func=lambda a, *, b=1: ...)),
             ("a1b1", dict(args=(), kwargs=dict(), func=lambda a=1, b=1: ...)),
             ("a3b1", dict(args=(3,), kwargs=dict(), func=lambda a=1, b=1: ...)),
@@ -144,6 +149,12 @@ class UtilsTestCase(unittest.TestCase):
             (
                 "a1b.*?",
                 dict(args=(1,), kwargs=dict(), func=lambda a, b=1: ...),
+                ["a1b1"],
+                ["a2b2"],
+            ),
+            (
+                "a1b1",
+                dict(args=(1,), kwargs=dict(b=1), func=lambda a, b=1: ...),
                 ["a1b1"],
                 ["a2b2"],
             ),
