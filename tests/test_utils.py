@@ -82,8 +82,8 @@ class UtilsTestCase(unittest.TestCase):
                 ),
             ),
         ]
-        for index, (excepted_key, data) in enumerate(test_data):
-            with self.subTest(index):
+        for excepted_key, data in test_data:
+            with self.subTest(excepted_key=excepted_key, data=data):
                 self.assertEqual(excepted_key, generate_strict_key(**data)[2])
 
     def test_generate_strict_key_pattern(self):
@@ -230,13 +230,11 @@ class UtilsTestCase(unittest.TestCase):
                 ["a2b3"],
             ),
         ]
-        for index, (excepted_pattern, data, hit_keys, miss_keys) in enumerate(
-            test_data
-        ):
-            with self.subTest(index):
+        for excepted_pattern, data, hit_keys, miss_keys in test_data:
+            with self.subTest(excepted_pattern=excepted_pattern, data=data):
                 excepted_pattern += "$"
                 self.assertEqual(
-                    excepted_pattern, generate_strict_key_pattern(**data), index,
+                    excepted_pattern, generate_strict_key_pattern(**data),
                 )
                 pattern = re.compile(excepted_pattern, re.DOTALL)
                 for key in hit_keys:
@@ -310,7 +308,8 @@ class UtilsTestCase(unittest.TestCase):
             ),
         ]
         for excepted_key, data in test_data:
-            self.assertEqual(excepted_key, generate_fast_key(**data)[2])
+            with self.subTest(excepted_key=excepted_key, data=data):
+                self.assertEqual(excepted_key, generate_fast_key(**data)[2])
 
     def test_generate_fast_key_pattern(self):
         with self.assertRaises(UnsupportedError):

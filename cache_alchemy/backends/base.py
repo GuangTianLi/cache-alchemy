@@ -176,7 +176,7 @@ class DistributedCache(BaseCache[DistributedCacheReturnType]):
                 delete_keys = self.client.smembers(self.namespace)
                 if delete_keys:
                     pipe.delete(*delete_keys)
-                pipe.delete(self.namespace)
+                    pipe.srem(self.namespace, *delete_keys)
                 pipe.srem(self.get_backend_namespace(), self.namespace)
                 pipe.execute()
         return len(delete_keys)
