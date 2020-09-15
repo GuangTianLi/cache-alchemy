@@ -5,8 +5,8 @@ Cache Alchemy
 .. image:: https://img.shields.io/pypi/v/cache-alchemy.svg
         :target: https://pypi.python.org/pypi/cache-alchemy
 
-.. image:: https://img.shields.io/travis/GuangTianLi/cache-alchemy.svg
-        :target: https://travis-ci.org/GuangTianLi/cache-alchemy
+.. image:: https://github.com/GuangTianLi/cache-alchemy/workflows/Python%20package/badge.svg
+        :target: https://github.com/GuangTianLi/cache-alchemy/actions
 
 .. image:: https://readthedocs.org/projects/cache-alchemy/badge/?version=latest
         :target: https://cache-alchemy.readthedocs.io/en/latest/?badge=latest
