@@ -66,6 +66,7 @@ class LRUDict(dict):
                 # still adjusting the links.
                 self.root = oldroot.next
                 oldkey = self.root.key
+                self.root.key = self.root.result = _sentry
                 # Now update the cache dictionary.
                 del self[oldkey]
                 # Save the potentially reentrant cache[key] assignment

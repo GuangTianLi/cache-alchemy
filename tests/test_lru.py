@@ -20,13 +20,13 @@ class LRUTestCase(unittest.TestCase):
 
     def test_lru_dict(self):
         lru_dict = LRUDict(5)
-        for index in range(5):
+        for index in range(6):
             lru_dict[index] = index
-        for index, link in zip(range(4, -1, -1), lru_dict.root):
+        for index, link in zip(range(5, 0, -1), lru_dict.root):
             self.assertEqual(index, link.key)
-        for index in range(4, -1, -1):
+        for index in range(5, 0, -1):
             self.assertEqual(index, lru_dict[index])
-        for index, link in zip(range(5), lru_dict.root):
+        for index, link in zip(range(5, 1), lru_dict.root):
             self.assertEqual(index, link.key)
 
     def test_lru_dict_clear(self):
