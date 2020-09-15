@@ -7,6 +7,7 @@ Cache Alchemy
 
 .. image:: https://github.com/GuangTianLi/cache-alchemy/workflows/test/badge.svg
         :target: https://github.com/GuangTianLi/cache-alchemy/actions
+        :alt: CI Test Status
 
 .. image:: https://readthedocs.org/projects/cache-alchemy/badge/?version=latest
         :target: https://cache-alchemy.readthedocs.io/en/latest/?badge=latest
