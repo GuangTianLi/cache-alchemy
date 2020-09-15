@@ -5,7 +5,7 @@ Cache Alchemy
 .. image:: https://img.shields.io/pypi/v/cache-alchemy.svg
         :target: https://pypi.python.org/pypi/cache-alchemy
 
-.. image:: https://github.com/GuangTianLi/cache-alchemy/workflows/Python%20package/badge.svg
+.. image:: https://github.com/GuangTianLi/cache-alchemy/workflows/test/badge.svg
         :target: https://github.com/GuangTianLi/cache-alchemy/actions
 
 .. image:: https://readthedocs.org/projects/cache-alchemy/badge/?version=latest
