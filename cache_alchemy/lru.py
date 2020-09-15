@@ -4,11 +4,11 @@ from typing import Iterable
 _sentry = object()
 
 
-class DoubleLinkedList(Iterable):
+class DoublyLinkedListNode(Iterable):
     __slots__ = ("prev", "next", "key", "result")
 
     def __init__(
-        self, key, result=None,
+        self, key=_sentry, result=None,
     ):
         self.prev = self
         self.next = self
@@ -39,9 +39,9 @@ class LRUDict(dict):
 
     def __init__(self, max_size: int):
         if max_size <= 0:
-            raise TypeError("Expected max_size to be larger than 0")
+            raise ValueError("Expected max_size to be larger than 0")
         self.max_size = max_size
-        self.root = DoubleLinkedList(key=_sentry)
+        self.root = DoublyLinkedListNode()
         self.lock = Lock()
         super().__init__()
 
@@ -64,7 +64,6 @@ class LRUDict(dict):
                 # still adjusting the links.
                 self.root = oldroot.next
                 oldkey = self.root.key
-                self.root.key = self.root.result = _sentry
                 # Now update the cache dictionary.
                 del self[oldkey]
                 # Save the potentially reentrant cache[key] assignment
@@ -73,22 +72,23 @@ class LRUDict(dict):
                 super().__setitem__(key, oldroot)
             else:
                 last = self.root.prev
-                link = DoubleLinkedList(key=key, result=value)
-                link.prev = last
-                link.next = self.root
-                last.next = self.root.prev = link
-                super().__setitem__(key, link)
+                node = DoublyLinkedListNode(key=key, result=value)
+                last.next = self.root.prev = node
+                node.prev = last
+                node.next = self.root
+                super().__setitem__(key, node)
 
     def __getitem__(self, item):
+        # Move the link to the front of the circular queue
         with self.lock:
-            value = super().__getitem__(item)
-            value.prev.next = value.next
-            value.next.prev = value.prev
+            node = super().__getitem__(item)
+            node.prev.next = node.next
+            node.next.prev = node.prev
             last = self.root.prev
-            last.next = self.root.prev = value
-            value.prev = last
-            value.next = self.root
-            return value.result
+            last.next = self.root.prev = node
+            node.prev = last
+            node.next = self.root
+            return node.result
 
     def get(self, k, default=None):
         """Use EAFP to avoid RLock"""
@@ -99,5 +99,5 @@ class LRUDict(dict):
 
     def clear(self):
         with self.lock:
-            self.root = DoubleLinkedList(key=_sentry)
+            self.root = DoublyLinkedListNode()
             super().clear()

@@ -1,12 +1,12 @@
 import unittest
 
 from cache_alchemy import LRUDict
-from cache_alchemy.lru import DoubleLinkedList, _sentry
+from cache_alchemy.lru import DoublyLinkedListNode
 
 
 class LRUTestCase(unittest.TestCase):
     def test_dict_full(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             LRUDict(-1)
         lru_dict = LRUDict(1)
         lru_dict[1] = 1
@@ -37,9 +37,9 @@ class LRUTestCase(unittest.TestCase):
         self.assertEqual(0, len(lru_dict.root))
 
     def test_double_link(self):
-        root = DoubleLinkedList(key=_sentry)
+        root = DoublyLinkedListNode()
         last = root.prev
-        link = DoubleLinkedList(key="1", result=1)
+        link = DoublyLinkedListNode(key="1", result=1)
         link.prev = last
         link.next = root
         root.prev = last.next = link
