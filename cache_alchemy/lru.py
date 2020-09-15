@@ -8,7 +8,9 @@ class DoublyLinkedListNode(Iterable):
     __slots__ = ("prev", "next", "key", "result")
 
     def __init__(
-        self, key=_sentry, result=None,
+        self,
+        key=_sentry,
+        result=None,
     ):
         self.prev = self
         self.next = self

@@ -55,7 +55,10 @@ class MemoryCache(BaseCache):
         self, args: Optional[tuple] = None, kwargs: Optional[dict] = None
     ) -> int:
         if args or kwargs:
-            pattern = self.make_key_pattern(args=args, kwargs=kwargs,)
+            pattern = self.make_key_pattern(
+                args=args,
+                kwargs=kwargs,
+            )
             count = 0
             for key in filter(pattern.match, list(self.cache_pool.keys())):
                 del self.cache_pool[key]

@@ -234,7 +234,8 @@ class UtilsTestCase(unittest.TestCase):
             with self.subTest(excepted_pattern=excepted_pattern, data=data):
                 excepted_pattern += "$"
                 self.assertEqual(
-                    excepted_pattern, generate_strict_key_pattern(**data),
+                    excepted_pattern,
+                    generate_strict_key_pattern(**data),
                 )
                 pattern = re.compile(excepted_pattern, re.DOTALL)
                 for key in hit_keys:

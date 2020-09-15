@@ -27,8 +27,7 @@ class UnsupportedError(ValueError):
 def generate_strict_key(
     *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False
 ) -> Tuple[dict, dict, str]:
-    """Generate function's arguments hash key from optionally typed positional and keyword arguments
-    """
+    """Generate function's arguments hash key from optionally typed positional and keyword arguments"""
 
     #: The code object representing the compiled function body.
     func_code = getattr(func, "__wrapped__", func).__code__
@@ -110,7 +109,11 @@ def generate_strict_key(
 
 
 def generate_strict_key_pattern(
-    *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False,
+    *,
+    args: Tuple,
+    kwargs: Dict,
+    func: FunctionType,
+    is_method: bool = False,
 ) -> str:
     func_code = getattr(func, "__wrapped__", func).__code__
     pos_count = func_code.co_argcount
@@ -172,6 +175,10 @@ def generate_fast_key(
 
 
 def generate_fast_key_pattern(
-    *, args: Tuple, kwargs: Dict, func: FunctionType, is_method: bool = False,
+    *,
+    args: Tuple,
+    kwargs: Dict,
+    func: FunctionType,
+    is_method: bool = False,
 ) -> str:
     raise UnsupportedError("fast hash not support pattern delete")
