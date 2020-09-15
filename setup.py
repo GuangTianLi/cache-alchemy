@@ -38,5 +38,8 @@ setup(
     tests_require=test_requirements,
     url="https://github.com/GuangTianLi/cache-alchemy",
     version="0.4.3",
+    extras_require={
+        "tests": test_requirements,
+    },
     zip_safe=False,
 )

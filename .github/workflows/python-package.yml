@@ -27,7 +27,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install codecov mypy coverage black==20.8b1
-        pip install .
+        pip install '.[tests]'
     - name: Lint
       run: |
         make lint
@@ -59,7 +59,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install codecov black mypy coverage
-        pip install .
+        pip install '.[tests]'
     - name: Lint
       run: |
         make lint
