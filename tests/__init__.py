@@ -6,7 +6,7 @@ from cache_alchemy.config import DefaultConfig
 
 
 class TestCacheConfig(DefaultConfig):
-    ...
+    CACHE_ALCHEMY_CACHE_KEY_PREFIX = "test:"
 
 
 def get_config():

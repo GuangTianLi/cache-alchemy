@@ -31,7 +31,8 @@ class BaseCache(Generic[ReturnType], ABC):
         expire: int,
         limit: int,
         is_method: bool = False,
-        strict=False,
+        strict: bool = False,
+        cache_key_prefix: str = "",
     ):
         self.cached_function = cast(FunctionType, cached_function)
         self.is_method = is_method
@@ -42,18 +43,19 @@ class BaseCache(Generic[ReturnType], ABC):
         self.generate_key_pattern = (
             generate_strict_key_pattern if strict else generate_fast_key_pattern
         )
+        self.cache_key_prefix = cache_key_prefix
 
     @property
     def function_hash(self) -> str:
-        return f"{self.__class__.__name__}:{self.cached_function.__module__}:{self.cached_function.__qualname__}"
+        return f"{self.cache_key_prefix}{self.__class__.__name__}:{self.cached_function.__module__}:{self.cached_function.__qualname__}"
 
     @property
     def namespace(self) -> str:
-        return f"{self.__class__.__module__}:{self.function_hash}-keys"
+        return f"{self.cache_key_prefix}{self.__class__.__module__}:{self.function_hash}-keys"
 
     @classmethod
-    def get_backend_namespace(cls) -> str:
-        return f"{cls.__module__}:{cls.__name__}:all-keys"
+    def get_backend_namespace(cls, cache_key_prefix: str = "") -> str:
+        return f"{cache_key_prefix}{cls.__module__}:{cls.__name__}:all-keys"
 
     @abstractmethod
     def get(self, *args, **kwargs) -> ReturnType:  # pragma: no cover
@@ -71,7 +73,9 @@ class BaseCache(Generic[ReturnType], ABC):
 
     @classmethod
     @abstractmethod
-    def get_all_namespace(cls) -> Set[str]:  # pragma: no cover
+    def get_all_namespace(
+        cls, cache_key_prefix: str = ""
+    ) -> Set[str]:  # pragma: no cover
         ...
 
     @classmethod
@@ -143,11 +147,14 @@ class DistributedCache(BaseCache[DistributedCacheReturnType]):
                 return self.deserialize(result)  # type: ignore
 
     def set(self, key: str, value: DistributedCacheReturnType) -> None:
-        self.client.sadd(self.get_backend_namespace(), self.namespace)
+        self.client.sadd(
+            self.get_backend_namespace(self.cache_key_prefix), self.namespace
+        )
         value = self.serialize(value)
         while self.client.scard(self.namespace) >= self.limit:
             del_key = self.client.spop(self.namespace)
-            self.client.delete(del_key)
+            if isinstance(del_key, bytes):
+                self.client.delete(del_key.decode())
 
         with self.client.pipeline() as pipe:
             if self.expire == -1:
@@ -163,7 +170,7 @@ class DistributedCache(BaseCache[DistributedCacheReturnType]):
     ) -> int:
         if args or kwargs:
             pattern = self.make_key_pattern(args=args, kwargs=kwargs)
-            delete_keys = list(
+            delete_keys = set(
                 filter(
                     pattern.match,
                     map(bytes.decode, self.client.smembers(self.namespace)),
@@ -177,21 +184,23 @@ class DistributedCache(BaseCache[DistributedCacheReturnType]):
                 if delete_keys:
                     pipe.delete(*delete_keys)
                     pipe.srem(self.namespace, *delete_keys)
-                pipe.srem(self.get_backend_namespace(), self.namespace)
+                pipe.srem(
+                    self.get_backend_namespace(self.cache_key_prefix), self.namespace
+                )
                 pipe.execute()
         return len(delete_keys)
 
     @classmethod
-    def get_all_namespace(cls) -> Set[str]:
+    def get_all_namespace(cls, cache_key_prefix: str = "") -> Set[str]:
         client = DefaultConfig.get_current_config().cache_redis_client
-        return client.smembers(cls.get_backend_namespace())
+        return client.smembers(cls.get_backend_namespace(cache_key_prefix))
 
     @classmethod
-    def flush_cache(cls) -> int:
+    def flush_cache(cls, cache_key_prefix: str = "") -> int:
         client = DefaultConfig.get_current_config().cache_redis_client
         count = 0
         with client.pipeline() as pipe:
-            for namespace in cls.get_all_namespace():
+            for namespace in cls.get_all_namespace(cache_key_prefix):
                 delete_keys = client.smembers(namespace)
                 if delete_keys:
                     pipe.delete(*delete_keys)

@@ -24,7 +24,8 @@ def _create_cache(
     expire: Optional[int],
     limit: Optional[int],
     is_method: bool = False,
-    strict=False,
+    strict: bool = False,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> BackendCls:
 
@@ -39,6 +40,7 @@ def _create_cache(
         limit=limit,
         is_method=is_method,
         strict=strict,
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -53,6 +55,7 @@ def cache(
     strict: bool,
     backend: str,
     dependency: List[CacheDependency],
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     """The base function to creat a cache object like this::
@@ -86,6 +89,7 @@ def cache(
         limit = config.CACHE_ALCHEMY_DEFAULT_LIMIT
     if expire is None:
         expire = config.CACHE_ALCHEMY_DEFAULT_EXPIRE
+    cache_key_prefix = cache_key_prefix or config.CACHE_ALCHEMY_CACHE_KEY_PREFIX
 
     def decorating_function(func: CacheFunctionType) -> CacheFunctionType:
         if limit == 0 or expire == 0:
@@ -98,6 +102,7 @@ def cache(
             limit=limit,
             is_method=is_method,
             strict=strict,
+            cache_key_prefix=cache_key_prefix,
             **kwargs,
         )
 
@@ -119,7 +124,7 @@ def cache(
 
         for item in dependency:
             item.cache_objects.add(cache)
-            item.register_dependency(item)
+            CacheDependency.register_dependency(item)
 
         wrapper.cache = cache  # type: ignore
         wrapper.cache_clear = cache_clear  # type: ignore
@@ -138,6 +143,7 @@ def json_cache(
     is_method: bool = False,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -147,6 +153,7 @@ def json_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_JSON_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -157,6 +164,7 @@ def method_json_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -166,6 +174,7 @@ def method_json_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_JSON_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -176,6 +185,7 @@ def property_json_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -185,6 +195,7 @@ def property_json_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_JSON_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -196,6 +207,7 @@ def memory_cache(
     is_method: bool = False,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -205,6 +217,7 @@ def memory_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_MEMORY_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -215,6 +228,7 @@ def method_memory_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -224,6 +238,7 @@ def method_memory_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_MEMORY_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -234,6 +249,7 @@ def property_memory_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -243,6 +259,7 @@ def property_memory_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_MEMORY_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -254,6 +271,7 @@ def pickle_cache(
     is_method: bool = False,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -263,6 +281,7 @@ def pickle_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_PICKLE_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -273,6 +292,7 @@ def method_pickle_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -282,6 +302,7 @@ def method_pickle_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_PICKLE_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )
 
@@ -292,6 +313,7 @@ def property_pickle_cache(
     expire: Optional[int] = None,
     strict: bool = False,
     dependency: Optional[List[CacheDependency]] = None,
+    cache_key_prefix: str = "",
     **kwargs,
 ) -> CacheDecoratorType:
     return cache(
@@ -301,5 +323,6 @@ def property_pickle_cache(
         strict=strict,
         backend=DefaultConfig.get_current_config().CACHE_ALCHEMY_PICKLE_BACKEND,
         dependency=dependency or [],
+        cache_key_prefix=cache_key_prefix,
         **kwargs,
     )

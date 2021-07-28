@@ -53,8 +53,7 @@ clean-build: ## remove build artifacts
 
 lint: ## statick check
 	black --check tests cache_alchemy
-
-	mypy cache_alchemy
+	mypy --install-types --non-interactive cache_alchemy
 
 test: ## run tests quickly with the default Python
 	python -m unittest discover -s tests

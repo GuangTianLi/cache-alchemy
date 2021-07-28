@@ -61,17 +61,17 @@ Example
         name: str
 
 
-    @pickle_cache
+    @pickle_cache()
     def get(name: str) -> User:
         return User(name=name)
 
 
-    @memory_cache
+    @memory_cache()
     def add(i: complex, j: complex) -> complex:
         return i + j
 
 
-    @json_cache
+    @json_cache()
     def add(i: int, j: int) -> int:
         return i + j
 

@@ -29,6 +29,8 @@ class DefaultConfig(BaseConfig):
     #: default cache expire time (seconds)
     #: - setting to 0 means uncached
     CACHE_ALCHEMY_DEFAULT_EXPIRE = 60 * 60 * 24
+    #: cache key prefix to avoid key conflict
+    CACHE_ALCHEMY_CACHE_KEY_PREFIX = ""
 
     #: Need to be assigned after init, if use distributed cache
     cache_redis_client: "Redis"

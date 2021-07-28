@@ -15,7 +15,7 @@ class JsonCacheTestCase(CacheTestCase):
     def test_cache_function(self):
         call_mock = Mock()
 
-        @json_cache
+        @json_cache()
         def add(a: int, b: int = 2) -> int:
             call_mock()
             return a + b
@@ -50,7 +50,7 @@ class JsonCacheTestCase(CacheTestCase):
     def test_cache_clear(self):
         call_mock = Mock()
 
-        @json_cache
+        @json_cache()
         def add(a: int, b: int = 2) -> int:
             call_mock()
             return a + b
@@ -70,29 +70,64 @@ class JsonCacheTestCase(CacheTestCase):
             self.config.CACHE_ALCHEMY_JSON_BACKEND
         )
 
-        self.assertEqual(set(), json_cache_backend.get_all_namespace())
+        self.assertEqual(
+            set(),
+            json_cache_backend.get_all_namespace(
+                self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX
+            ),
+        )
 
-        @json_cache
+        @json_cache()
         def add(a: int, b: int = 2) -> int:
             return a + b
 
-        @json_cache
+        @json_cache()
         def mul(a: int, b: int = 2) -> int:
             return a * b
 
         self.assertIn(
             json_cache_backend.__name__, add.cache.make_key(args=(1,), kwargs={})[2]
         )
-        self.assertEqual(0, len(json_cache_backend.get_all_namespace()))
-        self.assertEqual(0, json_cache_backend.flush_cache())
+        self.assertEqual(
+            0,
+            len(
+                json_cache_backend.get_all_namespace(
+                    self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX
+                )
+            ),
+        )
+        self.assertEqual(
+            0,
+            json_cache_backend.flush_cache(self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX),
+        )
         add(1)
-        self.assertEqual(1, len(json_cache_backend.get_all_namespace()))
-        self.assertEqual(1, json_cache_backend.flush_cache())
+        self.assertEqual(
+            1,
+            len(
+                json_cache_backend.get_all_namespace(
+                    self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX
+                )
+            ),
+        )
+        self.assertEqual(
+            1,
+            json_cache_backend.flush_cache(self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX),
+        )
         add(1)
         self.assertEqual(2, add.cache.misses)
         mul(1)
-        self.assertEqual(2, len(json_cache_backend.get_all_namespace()))
-        self.assertEqual(2, json_cache_backend.flush_cache())
+        self.assertEqual(
+            2,
+            len(
+                json_cache_backend.get_all_namespace(
+                    self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX
+                )
+            ),
+        )
+        self.assertEqual(
+            2,
+            json_cache_backend.flush_cache(self.config.CACHE_ALCHEMY_CACHE_KEY_PREFIX),
+        )
 
     def test_cache_clear_with_pattern_and_int_parameter(self):
         call_mock = Mock()
@@ -171,7 +206,7 @@ class JsonCacheTestCase(CacheTestCase):
 
         class Tmp:
             @classmethod
-            @method_json_cache
+            @method_json_cache()
             def add(cls, a: int, b: int = 2) -> int:
                 call_mock()
                 return a + b
@@ -188,7 +223,7 @@ class JsonCacheTestCase(CacheTestCase):
 
         class Tmp:
             @staticmethod
-            @json_cache
+            @json_cache()
             def add(a: int, b: int = 2) -> int:
                 call_mock()
                 return a + b
@@ -206,7 +241,7 @@ class JsonCacheTestCase(CacheTestCase):
 
         class Tmp:
             @property
-            @property_json_cache
+            @property_json_cache()
             def name(self) -> str:
                 call_mock()
                 return name

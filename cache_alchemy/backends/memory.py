@@ -69,7 +69,7 @@ class MemoryCache(BaseCache):
         return count
 
     @classmethod
-    def get_all_namespace(cls) -> Set[str]:
+    def get_all_namespace(cls, cache_key_prefix: str = "") -> Set[str]:
         return set(all_cache_pool.keys())
 
     @classmethod

@@ -8,7 +8,7 @@ redis_call_mock = MagicMock()
 config = get_config()
 
 
-@json_cache
+@json_cache()
 def json_test():
     redis_call_mock()
     return "test"
@@ -17,7 +17,7 @@ def json_test():
 memory_call_mock = MagicMock()
 
 
-@memory_cache
+@memory_cache()
 def memory_test():
     memory_call_mock()
     return "test"

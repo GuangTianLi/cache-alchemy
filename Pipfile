@@ -15,7 +15,7 @@ sphinx-rtd-theme = "*"
 bumpversion = "*"
 wheel = "*"
 tox = "*"
-mypy = "*"
+mypy = "==0.910"
 fakeredis = "*"
 
 [packages]
