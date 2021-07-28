@@ -85,7 +85,7 @@ Features
 - Cache ``Json Serializable`` function return value with **json_cache**
 - Cache Python Object function return value with **pickle_cache**
 - Cache any function return value with **memory_cache**
-- LRU Dict support - behave like normal dict
+- LRU Dict support
 
 TODO
 -------

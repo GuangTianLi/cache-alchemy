@@ -8,6 +8,7 @@ History
 * Refactory redis cache to json cache
 * Support pickle Cache
 * Add backend class in function hash
+* Add cache key prefix to avoid key conflict
 
 0.2.* (2019)
 ------------------

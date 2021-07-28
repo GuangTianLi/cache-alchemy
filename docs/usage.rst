@@ -17,11 +17,11 @@ To use Cache Alchemy in a project.
     config = DefaultConfig()
     config.cache_redis_client = Redis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
 
-    @memory_cache
+    @memory_cache()
     def add(i: complex, j: complex) -> complex:
         return i + j
 
-    @json_cache
+    @json_cache()
     def add(i: int, j: int) -> int:
         return i + j
 
@@ -29,16 +29,16 @@ To use Cache Alchemy in a project.
         x = 2
 
         @classmethod
-        @method_json_cache
+        @method_json_cache()
         def add(cls, y: int) -> int:
             return cls.x + b
 
-        @method_json_cache
+        @method_json_cache()
         def pow(self, y: int) -> int:
             return pow(self.x, y)
 
         @property
-        @property_json_cache
+        @property_json_cache()
         def name(self) -> int:
             return self.x
 
@@ -79,12 +79,12 @@ which can handle and cache custom classes e.g: dataclass.
     config.cache_redis_client = Redis.from_url(config.CACHE_ALCHEMY_REDIS_URL)
 
 
-    @pickle_cache
+    @pickle_cache()
     def add(i: complex, j: complex) -> complex:
         return i + j
 
 
-    @pickle_cache
+    @pickle_cache()
     def access_user(name: str) -> User:
         return User(name=name)
 
@@ -113,7 +113,7 @@ By setting ``CACHE_ALCHEMY_MEMORY_BACKEND`` to ``cache_alchemy.backends.memory.M
 
     config = CacheConfig()
 
-    @memory_cache
+    @memory_cache()
     def add(i: complex, j: complex) -> complex:
         return i + j
 
@@ -124,7 +124,7 @@ Use cache dependency to declare dependency between two function.
 
 .. code-block:: python
 
-    @json_cache
+    @json_cache()
     def add(a, b):
         return a + b
 
