@@ -20,7 +20,13 @@ class LRUDict(dict):
 
     def __setitem__(self, key, value):
         with self.lock:
-            if self.full:
+            if key in self:
+                # Getting here means that this same key was added to the
+                # cache while the lock was released.  Since the link
+                # update is already done, we need only return the
+                # computed result and update the count of misses.
+                pass
+            elif self.full:
                 # Use the old root to store the new key and result.
                 oldroot: DoublyLinkedListNode = self.root
                 oldroot.key = key

@@ -5,18 +5,19 @@ from cache_alchemy.lru import DoublyLinkedListNode
 
 
 class LRUTestCase(unittest.TestCase):
-    def test_dict_full(self):
+    def test_full(self):
         with self.assertRaises(ValueError):
             LRUDict(-1)
-        lru_dict = LRUDict(1)
+        lru_dict = LRUDict(2)
         lru_dict[1] = 1
-        self.assertTrue(lru_dict.full)
-        self.assertEqual(1, lru_dict[1])
+        lru_dict[1] = 1
         lru_dict[2] = 2
+        self.assertEqual(2, len(lru_dict.root))
+        self.assertTrue(lru_dict.full)
+        self.assertEqual(2, lru_dict[2])
+        lru_dict[3] = 3
         self.assertFalse(1 in lru_dict)
         self.assertEqual(2, lru_dict[2])
-        self.assertEqual("{2: 2}", str(lru_dict))
-        self.assertEqual("{2: 2}", repr(lru_dict))
 
     def test_lru_dict(self):
         lru_dict = LRUDict(5)
